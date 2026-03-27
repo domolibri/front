@@ -1,0 +1,13 @@
+# Angular
+dist/
+tmp/
+*.log
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+
+# System Files
+.DS_Store
+Thumbs.db
