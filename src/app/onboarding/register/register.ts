@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Onboarding } from '../../services/onboarding';
 import { AuthService } from '../../shared/auth.service';
 import { SnackbarService } from '../../shared/snackbar.service';
@@ -15,6 +16,7 @@ export class Register {
   form: FormGroup;
   isLoading = false;
   errorMessage = '';
+  fieldErrors: Record<string, string> = {};
 
   constructor(
     private fb: FormBuilder,
@@ -35,6 +37,10 @@ export class Register {
     return this.form.controls;
   }
 
+  clearFieldError(field: string): void {
+    delete this.fieldErrors[field];
+  }
+
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -43,6 +49,7 @@ export class Register {
 
     this.isLoading = true;
     this.errorMessage = '';
+    this.fieldErrors = {};
 
     this.onboarding.registerEditora(this.form.value).subscribe({
       next: (res) => {
@@ -51,10 +58,19 @@ export class Register {
         this.snackbar.show('Editora cadastrada com sucesso! Bem-vindo(a)!');
         this.router.navigate(['/dashboard']);
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.isLoading = false;
-        this.errorMessage =
-          err.error?.message ?? 'Erro ao cadastrar. Tente novamente.';
+        if (err.status === 400) {
+          const apiErrors: Record<string, string[]> = err.error?.errors ?? {};
+          for (const [field, messages] of Object.entries(apiErrors)) {
+            const key = field.charAt(0).toLowerCase() + field.slice(1);
+            this.fieldErrors[key] = Array.isArray(messages) ? messages[0] : messages;
+          }
+        } else if (err.status === 409 || err.status === 422) {
+          this.errorMessage = err.error?.detail ?? err.error?.title ?? 'Operação não permitida.';
+        } else {
+          this.snackbar.show('Erro inesperado. Tente novamente.', 'error');
+        }
       },
     });
   }

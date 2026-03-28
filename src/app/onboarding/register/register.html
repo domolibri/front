@@ -14,13 +14,17 @@
           type="text"
           formControlName="nomeEditora"
           placeholder="Ex: Editora Horizonte"
-          [class.is-invalid]="f['nomeEditora'].invalid && f['nomeEditora'].touched"
+          [class.is-invalid]="(f['nomeEditora'].invalid && f['nomeEditora'].touched) || fieldErrors['nomeEditora']"
+          (input)="clearFieldError('nomeEditora')"
         />
         @if (f['nomeEditora'].touched && f['nomeEditora'].errors?.['required']) {
           <span class="form-error">Nome da editora é obrigatório.</span>
         }
         @if (f['nomeEditora'].touched && f['nomeEditora'].errors?.['minlength']) {
           <span class="form-error">Mínimo de 2 caracteres.</span>
+        }
+        @if (fieldErrors['nomeEditora']) {
+          <span class="form-error">{{ fieldErrors['nomeEditora'] }}</span>
         }
       </div>
 
@@ -31,10 +35,17 @@
           type="text"
           formControlName="nomeAdmin"
           placeholder="Ex: João Silva"
-          [class.is-invalid]="f['nomeAdmin'].invalid && f['nomeAdmin'].touched"
+          [class.is-invalid]="(f['nomeAdmin'].invalid && f['nomeAdmin'].touched) || fieldErrors['nomeAdmin']"
+          (input)="clearFieldError('nomeAdmin')"
         />
         @if (f['nomeAdmin'].touched && f['nomeAdmin'].errors?.['required']) {
           <span class="form-error">Nome é obrigatório.</span>
+        }
+        @if (f['nomeAdmin'].touched && f['nomeAdmin'].errors?.['minlength']) {
+          <span class="form-error">Mínimo de 2 caracteres.</span>
+        }
+        @if (fieldErrors['nomeAdmin']) {
+          <span class="form-error">{{ fieldErrors['nomeAdmin'] }}</span>
         }
       </div>
 
@@ -45,13 +56,17 @@
           type="email"
           formControlName="emailAdmin"
           placeholder="seu@email.com"
-          [class.is-invalid]="f['emailAdmin'].invalid && f['emailAdmin'].touched"
+          [class.is-invalid]="(f['emailAdmin'].invalid && f['emailAdmin'].touched) || fieldErrors['emailAdmin']"
+          (input)="clearFieldError('emailAdmin')"
         />
         @if (f['emailAdmin'].touched && f['emailAdmin'].errors?.['required']) {
           <span class="form-error">E-mail é obrigatório.</span>
         }
         @if (f['emailAdmin'].touched && f['emailAdmin'].errors?.['email']) {
           <span class="form-error">Informe um e-mail válido.</span>
+        }
+        @if (fieldErrors['emailAdmin']) {
+          <span class="form-error">{{ fieldErrors['emailAdmin'] }}</span>
         }
       </div>
 
@@ -62,13 +77,17 @@
           type="password"
           formControlName="senha"
           placeholder="Mínimo 6 caracteres"
-          [class.is-invalid]="f['senha'].invalid && f['senha'].touched"
+          [class.is-invalid]="(f['senha'].invalid && f['senha'].touched) || fieldErrors['senha']"
+          (input)="clearFieldError('senha')"
         />
         @if (f['senha'].touched && f['senha'].errors?.['required']) {
           <span class="form-error">Senha é obrigatória.</span>
         }
         @if (f['senha'].touched && f['senha'].errors?.['minlength']) {
           <span class="form-error">Mínimo de 6 caracteres.</span>
+        }
+        @if (fieldErrors['senha']) {
+          <span class="form-error">{{ fieldErrors['senha'] }}</span>
         }
       </div>
 
