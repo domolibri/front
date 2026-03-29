@@ -2,21 +2,34 @@ import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly TOKEN_KEY = 'access_token';
+  // We no longer store the token in localStorage for security (XSS prevention).
+  // Authentication status is now managed by the presence of a HttpOnly cookie 
+  // which the browser sends automatically.
+  
+  private _isAuthenticated = false;
 
-  saveToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+  constructor() {
+    // Initial check could be a "me" endpoint or similar
+    // For now, we'll assume the app starts unauthenticated and 
+    // let the 401 interceptor handle session expiry.
   }
 
-  getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+  setAuthenticated(status: boolean): void {
+    this._isAuthenticated = status;
+  }
+
+  saveToken(token?: string): void {
+    // We update our internal auth state.
+    // In a cookie-based flow, the backend handles the actual storage.
+    this._isAuthenticated = true;
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    return this._isAuthenticated;
   }
 
   logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
+    this._isAuthenticated = false;
+    // The actual cookie removal happens on the server-side via the logout endpoint
   }
 }

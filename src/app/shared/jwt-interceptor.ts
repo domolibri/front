@@ -1,11 +1,14 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { AuthService } from './auth.service';
 
+/**
+ * We no longer manually attach the Authorization header from localStorage.
+ * Instead, we set withCredentials = true to allow the browser to 
+ * automatically include the HttpOnly secure cookie in every request.
+ */
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = inject(AuthService).getToken();
-  if (token) {
-    req = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
-  }
-  return next(req);
+  const secureReq = req.clone({
+    withCredentials: true
+  });
+  
+  return next(secureReq);
 };
