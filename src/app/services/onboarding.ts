@@ -12,7 +12,6 @@ export interface RegisterEditoraRequest {
 
 export interface RegisterEditoraResponse {
   editoraId: string;
-  token: string;
   message: string;
 }
 

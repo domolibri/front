@@ -8,6 +8,7 @@ import { SnackbarService } from '../../shared/snackbar.service';
 
 @Component({
   selector: 'app-register',
+  standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.scss',
@@ -29,7 +30,14 @@ export class Register {
       nomeEditora: ['', [Validators.required, Validators.minLength(2)]],
       nomeAdmin: ['', [Validators.required, Validators.minLength(2)]],
       emailAdmin: ['', [Validators.required, Validators.email]],
-      senha: ['', [Validators.required, Validators.minLength(6)]],
+      senha: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/),
+        ],
+      ],
     });
   }
 
@@ -54,7 +62,7 @@ export class Register {
     this.onboarding.registerEditora(this.form.value).subscribe({
       next: (res) => {
         this.isLoading = false;
-        this.auth.saveToken(res.token);
+        // Token is no longer returned on registration. User must verify email.
         this.router.navigate(['/cadastro/sucesso'], {
           queryParams: { email: this.form.value.emailAdmin },
         });

@@ -1,35 +1,38 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap, map, catchError, of } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // We no longer store the token in localStorage for security (XSS prevention).
-  // Authentication status is now managed by the presence of a HttpOnly cookie 
-  // which the browser sends automatically.
-  
-  private _isAuthenticated = false;
+  private _isAuthenticated$ = new BehaviorSubject<boolean>(false);
+  isAuthenticated$ = this._isAuthenticated$.asObservable();
 
-  constructor() {
-    // Initial check could be a "me" endpoint or similar
-    // For now, we'll assume the app starts unauthenticated and 
-    // let the 401 interceptor handle session expiry.
+  constructor(private http: HttpClient) {}
+
+  checkSession(): Observable<boolean> {
+    return this.http.get<any>(`${environment.apiUrl}/api/auth/me`).pipe(
+      map((): boolean => true),
+      tap((authenticated: boolean) => this._isAuthenticated$.next(authenticated)),
+      catchError(() => {
+        this._isAuthenticated$.next(false);
+        return of(false);
+      })
+    );
   }
 
   setAuthenticated(status: boolean): void {
-    this._isAuthenticated = status;
-  }
-
-  saveToken(token?: string): void {
-    // We update our internal auth state.
-    // In a cookie-based flow, the backend handles the actual storage.
-    this._isAuthenticated = true;
+    this._isAuthenticated$.next(status);
   }
 
   isAuthenticated(): boolean {
-    return this._isAuthenticated;
+    return this._isAuthenticated$.value;
   }
 
   logout(): void {
-    this._isAuthenticated = false;
-    // The actual cookie removal happens on the server-side via the logout endpoint
+    this.http.post(`${environment.apiUrl}/api/auth/logout`, {}).subscribe({
+      next: () => this._isAuthenticated$.next(false),
+      error: () => this._isAuthenticated$.next(false),
+    });
   }
 }

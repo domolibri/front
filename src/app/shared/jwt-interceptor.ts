@@ -1,14 +1,31 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { catchError, throwError } from 'rxjs';
+import { Router } from '@angular/router';
+import { AuthService } from './auth.service';
 
 /**
- * We no longer manually attach the Authorization header from localStorage.
- * Instead, we set withCredentials = true to allow the browser to 
- * automatically include the HttpOnly secure cookie in every request.
+ * Ensures withCredentials is set for cookie-based auth
+ * and handles 401 errors for session cleanup.
  */
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
   const secureReq = req.clone({
-    withCredentials: true
+    withCredentials: true,
   });
-  
-  return next(secureReq);
+
+  return next(secureReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        authService.setAuthenticated(false);
+        // Do not redirect to login if we are already on onboarding pages
+        if (!router.url.startsWith('/onboarding') && router.url !== '/') {
+          router.navigate(['/']);
+        }
+      }
+      return throwError(() => error);
+    })
+  );
 };
