@@ -1,0 +1,25 @@
+<div class="verify-email">
+  <div class="verify-email__card">
+
+    @if (status === 'verifying') {
+      <div class="verify-email__state">
+        <span class="verify-email__spinner" aria-hidden="true"></span>
+        <h1 class="verify-email__title">Verificando seu e-mail...</h1>
+        <p class="verify-email__subtitle">Aguarde um momento enquanto confirmamos sua conta.</p>
+      </div>
+    }
+
+    @if (status === 'success') {
+      <div class="verify-email__state">
+        <span class="verify-email__icon verify-email__icon--success" aria-hidden="true">✓</span>
+        <h1 class="verify-email__title">E-mail confirmado!</h1>
+        <p class="verify-email__subtitle">
+          Sua conta está ativa. Redirecionando para o dashboard em
+          <strong>{{ countdown }}s</strong>…
+        </p>
+        <a routerLink="/dashboard" class="verify-email__btn">Ir agora para o Dashboard</a>
+      </div>
+    }
+
+  </div>
+</div>

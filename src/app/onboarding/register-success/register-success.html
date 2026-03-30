@@ -1,0 +1,29 @@
+<div class="register-success">
+  <div class="register-success__card">
+
+    <span class="register-success__icon" aria-hidden="true">✓</span>
+
+    <h1 class="register-success__title">Editora cadastrada com sucesso!</h1>
+
+    <p class="register-success__message">
+      Enviamos um e-mail de confirmação para
+      @if (email) {
+        <strong>{{ email }}</strong>
+      } @else {
+        <strong>o endereço informado</strong>
+      }.
+    </p>
+
+    <p class="register-success__instruction">
+      Acesse sua caixa de entrada e clique no link para ativar sua conta antes de fazer login.
+    </p>
+
+    <div class="register-success__spam-tip">
+      <span class="register-success__spam-icon" aria-hidden="true">💡</span>
+      Não recebeu? Verifique a pasta de spam ou lixo eletrônico.
+    </div>
+
+    <a routerLink="/" class="register-success__btn">Voltar ao início</a>
+
+  </div>
+</div>

@@ -55,8 +55,9 @@ export class Register {
       next: (res) => {
         this.isLoading = false;
         this.auth.saveToken(res.token);
-        this.snackbar.show('Editora cadastrada com sucesso! Bem-vindo(a)!');
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/cadastro/sucesso'], {
+          queryParams: { email: this.form.value.emailAdmin },
+        });
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading = false;
