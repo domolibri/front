@@ -64,4 +64,16 @@ export class Onboarding {
   verifyEmail(email: string, token: string): Observable<VerifyEmailResponse> {
     return this.http.post<VerifyEmailResponse>(`${this.baseUrl}/verify-email`, { email, token });
   }
+
+  resendVerificationEmail(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/resend-verification-email`, { email });
+  }
+
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(email: string, token: string, novaSenha: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/reset-password`, { email, token, novaSenha });
+  }
 }

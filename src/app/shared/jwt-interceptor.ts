@@ -20,8 +20,11 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
         authService.setAuthenticated(false);
-        // Do not redirect to login if we are already on onboarding pages
-        if (!router.url.startsWith('/onboarding') && router.url !== '/') {
+        // Do not redirect if already on public/auth pages
+        const publicPaths = ['/', '/login', '/cadastro', '/esqueci-senha', '/redefinir-senha'];
+        const isPublicPage =
+          publicPaths.includes(router.url) || router.url.startsWith('/onboarding');
+        if (!isPublicPage) {
           router.navigate(['/']);
         }
       }

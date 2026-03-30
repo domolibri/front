@@ -1,1 +1,81 @@
-<p>login works!</p>
+<div class="login">
+  <div class="login__card">
+    <a routerLink="/" class="login__back">← Voltar</a>
+
+    <h1 class="login__title">Entrar</h1>
+    <p class="login__subtitle">Acesse sua conta para gerenciar sua editora.</p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login__form" novalidate>
+
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="seu@email.com"
+          [class.is-invalid]="f['email'].invalid && f['email'].touched"
+        />
+        @if (f['email'].touched && f['email'].errors?.['required']) {
+          <span class="form-error">E-mail é obrigatório.</span>
+        }
+        @if (f['email'].touched && f['email'].errors?.['email']) {
+          <span class="form-error">Informe um e-mail válido.</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input
+          id="senha"
+          type="password"
+          formControlName="senha"
+          placeholder="Sua senha"
+          [class.is-invalid]="f['senha'].invalid && f['senha'].touched"
+        />
+        @if (f['senha'].touched && f['senha'].errors?.['required']) {
+          <span class="form-error">Senha é obrigatória.</span>
+        }
+      </div>
+
+      <div class="login__forgot">
+        <a routerLink="/esqueci-senha">Esqueci minha senha</a>
+      </div>
+
+      @if (errorMessage) {
+        <div class="form-alert form-alert--error">{{ errorMessage }}</div>
+      }
+
+      @if (emailNotVerified) {
+        <div class="form-alert form-alert--warning">
+          <p>Seu e-mail ainda não foi verificado.</p>
+          @if (resendSuccess) {
+            <p class="resend-success">✓ Novo link enviado! Verifique sua caixa de entrada.</p>
+          } @else {
+            <button
+              type="button"
+              class="resend-btn"
+              [disabled]="isResending"
+              (click)="resendVerification()"
+            >
+              {{ isResending ? 'Enviando...' : 'Reenviar e-mail de verificação' }}
+            </button>
+            @if (resendError) {
+              <p class="resend-error">{{ resendError }}</p>
+            }
+          }
+        </div>
+      }
+
+      <button type="submit" class="login__btn" [disabled]="isLoading">
+        {{ isLoading ? 'Entrando...' : 'Entrar' }}
+      </button>
+
+    </form>
+
+    <p class="login__register-link">
+      Ainda não tem conta? <a routerLink="/cadastro">Cadastrar editora</a>
+    </p>
+  </div>
+</div>
+

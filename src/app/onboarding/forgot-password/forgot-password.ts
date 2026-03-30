@@ -1,0 +1,51 @@
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { Onboarding } from '../../services/onboarding';
+
+@Component({
+  selector: 'app-forgot-password',
+  standalone: true,
+  imports: [ReactiveFormsModule, RouterLink],
+  templateUrl: './forgot-password.html',
+  styleUrl: './forgot-password.scss',
+})
+export class ForgotPassword {
+  form: FormGroup;
+  isLoading = false;
+  submitted = false;
+
+  constructor(
+    private fb: FormBuilder,
+    private onboarding: Onboarding,
+  ) {
+    this.form = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+    });
+  }
+
+  get f() {
+    return this.form.controls;
+  }
+
+  onSubmit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.isLoading = true;
+
+    this.onboarding.forgotPassword(this.form.value.email).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.submitted = true;
+      },
+      error: () => {
+        // Always show success to avoid e-mail enumeration
+        this.isLoading = false;
+        this.submitted = true;
+      },
+    });
+  }
+}
