@@ -1,7 +1,6 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AsyncPipe, NgTemplateOutlet, UpperCasePipe } from '@angular/common';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../shared/auth.service';
 
 interface DashboardCard {
@@ -23,15 +22,13 @@ export class Dashboard {
   protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  private readonly currentUser = toSignal(this.auth.currentUser$, { initialValue: null });
-
   protected logout(): void {
     this.auth.logout();
     this.router.navigate(['/']);
   }
 
-  protected readonly cards = computed((): DashboardCard[] => {
-    const brandingConfigurado = this.currentUser()?.brandingConfigurado ?? false;
+  protected get cards(): DashboardCard[] {
+    const brandingConfigurado = this.auth.currentUser?.brandingConfigurado ?? false;
     return [
       {
         title: 'Identidade Visual',
@@ -63,6 +60,6 @@ export class Dashboard {
         badge: 'Em breve',
       },
     ];
-  });
+  }
 }
 

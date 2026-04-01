@@ -65,7 +65,7 @@
     <section class="dashboard__section">
       <h2 class="dashboard__section-title">Módulos</h2>
       <div class="dashboard__grid">
-        @for (card of cards(); track card.title) {
+        @for (card of cards; track card.title) {
           @if (card.route) {
             <a class="dashboard__card dashboard__card--active" [routerLink]="card.route">
               <ng-container *ngTemplateOutlet="cardContent; context: { $implicit: card }" />
