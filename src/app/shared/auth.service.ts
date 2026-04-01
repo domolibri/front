@@ -44,8 +44,6 @@ export class AuthService {
 
   setAuthenticated(status: boolean): void {
     this._isAuthenticated$.next(status);
-    // Notifica o guard que a autenticação foi resolvida (ex: após login manual).
-    this._initialized$.next(status);
   }
 
   isAuthenticated(): boolean {

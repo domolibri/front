@@ -56,9 +56,12 @@ export class Login {
 
     this.onboarding.login(email, senha).subscribe({
       next: () => {
-        this.isLoading = false;
-        this.auth.setAuthenticated(true);
-        this.router.navigate(['/dashboard']);
+        // Busca os dados da sessão após login para popular currentUser$
+        // antes de navegar — garante que topbar e módulos apareçam juntos.
+        this.auth.checkSession().subscribe((authenticated) => {
+          this.isLoading = false;
+          this.router.navigate([authenticated ? '/dashboard' : '/']);
+        });
       },
       error: (err) => {
         this.isLoading = false;
