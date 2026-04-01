@@ -3,19 +3,34 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, map, catchError, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+export interface CurrentUser {
+  tenantId: string;
+  email: string;
+  nome: string;
+  nomeEditora?: string;
+  brandingConfigurado?: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private _isAuthenticated$ = new BehaviorSubject<boolean>(false);
+  private _currentUser$ = new BehaviorSubject<CurrentUser | null>(null);
+
   isAuthenticated$ = this._isAuthenticated$.asObservable();
+  currentUser$ = this._currentUser$.asObservable();
 
   constructor(private http: HttpClient) {}
 
   checkSession(): Observable<boolean> {
-    return this.http.get<any>(`${environment.apiUrl}/api/auth/me`).pipe(
+    return this.http.get<CurrentUser>(`${environment.apiUrl}/api/auth/me`).pipe(
+      tap((user) => {
+        this._currentUser$.next(user);
+        this._isAuthenticated$.next(true);
+      }),
       map((): boolean => true),
-      tap((authenticated: boolean) => this._isAuthenticated$.next(authenticated)),
       catchError(() => {
         this._isAuthenticated$.next(false);
+        this._currentUser$.next(null);
         return of(false);
       })
     );
@@ -29,10 +44,20 @@ export class AuthService {
     return this._isAuthenticated$.value;
   }
 
+  get currentUser(): CurrentUser | null {
+    return this._currentUser$.value;
+  }
+
   logout(): void {
     this.http.post(`${environment.apiUrl}/api/auth/logout`, {}).subscribe({
-      next: () => this._isAuthenticated$.next(false),
-      error: () => this._isAuthenticated$.next(false),
+      next: () => {
+        this._isAuthenticated$.next(false);
+        this._currentUser$.next(null);
+      },
+      error: () => {
+        this._isAuthenticated$.next(false);
+        this._currentUser$.next(null);
+      },
     });
   }
 }

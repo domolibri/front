@@ -1,1 +1,140 @@
-<p>dashboard works!</p>
+<div class="dashboard">
+
+  <!-- Topbar -->
+  <header class="dashboard__topbar">
+    <div class="dashboard__topbar-brand">
+      <span class="dashboard__topbar-logo">📚</span>
+      <span class="dashboard__topbar-name">SaaS Editorial</span>
+    </div>
+    @if (auth.currentUser$ | async; as user) {
+      <div class="dashboard__topbar-user">
+        <span class="dashboard__topbar-avatar">{{ user.nome[0] | uppercase }}</span>
+        <span class="dashboard__topbar-username">{{ user.nome }}</span>
+        <button class="dashboard__topbar-logout" (click)="logout()" title="Sair">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    }
+  </header>
+
+  <main class="dashboard__main">
+
+    <!-- Greeting -->
+    <section class="dashboard__greeting">
+      @if (auth.currentUser$ | async; as user) {
+        <h1 class="dashboard__greeting-title">Olá, {{ user.nome.split(' ')[0] }} 👋</h1>
+        <p class="dashboard__greeting-sub">
+          Bem-vindo ao painel
+          @if (user.nomeEditora) {
+            da <strong>{{ user.nomeEditora }}</strong>
+          } @else {
+            da sua editora
+          }. O que vamos configurar hoje?
+        </p>
+      } @else {
+        <h1 class="dashboard__greeting-title">Bem-vindo ao painel 👋</h1>
+        <p class="dashboard__greeting-sub">Selecione uma área para começar.</p>
+      }
+    </section>
+
+    <!-- Status strip -->
+    <section class="dashboard__status">
+      <div class="dashboard__status-item">
+        <span class="dashboard__status-dot dashboard__status-dot--ok"></span>
+        <span>Fase 1 — Onboarding</span>
+        <span class="dashboard__status-badge dashboard__status-badge--active">Ativo</span>
+      </div>
+      <div class="dashboard__status-item">
+        <span class="dashboard__status-dot dashboard__status-dot--pending"></span>
+        <span>Fase 2 — Workflow Editorial</span>
+        <span class="dashboard__status-badge">Em desenvolvimento</span>
+      </div>
+      <div class="dashboard__status-item">
+        <span class="dashboard__status-dot dashboard__status-dot--pending"></span>
+        <span>Fase 3 — Serviços IA</span>
+        <span class="dashboard__status-badge">Planejado</span>
+      </div>
+    </section>
+
+    <!-- Cards grid -->
+    <section class="dashboard__section">
+      <h2 class="dashboard__section-title">Módulos</h2>
+      <div class="dashboard__grid">
+        @for (card of cards(); track card.title) {
+          @if (card.route) {
+            <a class="dashboard__card dashboard__card--active" [routerLink]="card.route">
+              <ng-container *ngTemplateOutlet="cardContent; context: { $implicit: card }" />
+            </a>
+          } @else {
+            <div class="dashboard__card dashboard__card--disabled">
+              <ng-container *ngTemplateOutlet="cardContent; context: { $implicit: card }" />
+            </div>
+          }
+        }
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Card content template -->
+<ng-template #cardContent let-card>
+  <div class="dashboard__card-icon">
+    @switch (card.icon) {
+      @case ('branding') {
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="13.5" cy="6.5" r="2.5"/>
+          <circle cx="17.5" cy="10.5" r="2.5"/>
+          <circle cx="8.5" cy="7.5" r="2.5"/>
+          <circle cx="6.5" cy="12.5" r="2.5"/>
+          <path d="M12 20v-8.5"/>
+          <path d="M9 17l3 3 3-3"/>
+        </svg>
+      }
+      @case ('users') {
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      }
+      @case ('books') {
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+      }
+      @case ('payments') {
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      }
+    }
+  </div>
+  <div class="dashboard__card-body">
+    <div class="dashboard__card-header">
+      <span class="dashboard__card-title">{{ card.title }}</span>
+      @if (card.badge) {
+        <span class="dashboard__card-badge" [class.dashboard__card-badge--configured]="card.badgeConfigured">{{ card.badge }}</span>
+      }
+    </div>
+    <span class="dashboard__card-desc">{{ card.description }}</span>
+  </div>
+  @if (card.route) {
+    <svg class="dashboard__card-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 18l6-6-6-6"/>
+    </svg>
+  }
+</ng-template>
