@@ -76,4 +76,18 @@ export class Onboarding {
   resetPassword(email: string, token: string, novaSenha: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.baseUrl}/reset-password`, { email, token, novaSenha });
   }
+
+  updateBranding(corPrimaria: string, logoFile: File | null): Observable<any> {
+    const formData = new FormData();
+
+    if (corPrimaria) {
+      formData.append('CorPrimaria', corPrimaria);
+    }
+
+    if (logoFile) {
+      formData.append('Logo', logoFile, logoFile.name);
+    }
+
+    return this.http.patch<any>(`${environment.apiUrl}/api/editora/branding`, formData);
+  }
 }

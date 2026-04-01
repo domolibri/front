@@ -8,6 +8,7 @@ import { VerifyEmail } from './onboarding/verify-email/verify-email';
 import { VerifyEmailFailed } from './onboarding/verify-email-failed/verify-email-failed';
 import { ForgotPassword } from './onboarding/forgot-password/forgot-password';
 import { ResetPassword } from './onboarding/reset-password/reset-password';
+import { Branding } from './onboarding/branding/branding';
 import { authGuard } from './shared/auth-guard';
 
 export const routes: Routes = [
@@ -20,5 +21,6 @@ export const routes: Routes = [
   { path: 'esqueci-senha', component: ForgotPassword },
   { path: 'redefinir-senha', component: ResetPassword },
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },
+  { path: 'branding', component: Branding, canActivate: [authGuard] },
   { path: '**', redirectTo: '' },
 ];

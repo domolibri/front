@@ -1,1 +1,69 @@
-<p>branding works!</p>
+<section class="branding">
+  <div class="branding__header">
+    <h2 class="branding__title">Identidade Visual</h2>
+    <p class="branding__subtitle">Configure a aparência da sua editora na plataforma.</p>
+  </div>
+
+  <div class="branding__card">
+    <form class="branding__form" (ngSubmit)="salvarBranding()">
+
+      <!-- Cor primária -->
+      <div class="branding__field">
+        <label class="branding__label" for="corPrimaria">Cor primária</label>
+        <p class="branding__hint">Utilizada em botões, links e destaques da sua plataforma.</p>
+        <div class="branding__color-row">
+          <input
+            class="branding__color-input"
+            type="color"
+            id="corPrimaria"
+            [(ngModel)]="corPrimaria"
+            name="corPrimaria"
+          />
+          <span class="branding__color-swatch" [style.background]="corPrimaria"></span>
+          <span class="branding__color-hex">{{ corPrimaria }}</span>
+        </div>
+      </div>
+
+      <hr class="branding__divider" />
+
+      <!-- Logotipo -->
+      <div class="branding__field">
+        <label class="branding__label">Logotipo</label>
+        <p class="branding__hint">Formatos aceitos: PNG, JPG, SVG. Tamanho recomendado: 400 × 120 px.</p>
+
+        <label class="branding__upload" for="logoInput">
+          <svg class="branding__upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span class="branding__upload-text">
+            {{ arquivoLogo ? arquivoLogo.name : 'Clique para selecionar uma imagem' }}
+          </span>
+          <input
+            class="branding__upload-input"
+            type="file"
+            id="logoInput"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+          />
+        </label>
+
+        @if (imagemPreview) {
+          <div class="branding__preview">
+            <p class="branding__preview-label">Pré-visualização</p>
+            <div class="branding__preview-frame">
+              <img class="branding__preview-img" [src]="imagemPreview" alt="Preview do logotipo" />
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="branding__actions">
+        <button class="branding__btn" type="submit">Salvar configurações</button>
+      </div>
+
+    </form>
+  </div>
+</section>
