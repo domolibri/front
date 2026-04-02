@@ -102,7 +102,10 @@ describe('AuthService', () => {
     });
 
     it('should set isAuthenticated to false on HTTP error', () => {
-      service.setAuthenticated(true);
+      // Seed authenticated state via a first successful call
+      service.checkSession().subscribe();
+      http.expectOne(ME_URL).flush(mockUser);
+
       service.checkSession().subscribe();
       http.expectOne(ME_URL).flush('error', { status: 401, statusText: 'Unauthorized' });
       expect(service.isAuthenticated()).toBe(false);
@@ -128,26 +131,36 @@ describe('AuthService', () => {
     });
   });
 
-  // ─── setAuthenticated() ───────────────────────────────────────────────────
+  // ─── clearLocalSession() ──────────────────────────────────────────────────
 
-  describe('setAuthenticated()', () => {
-    it('should set isAuthenticated to true', () => {
-      service.setAuthenticated(true);
-      expect(service.isAuthenticated()).toBe(true);
+  describe('clearLocalSession()', () => {
+    beforeEach(() => {
+      service.checkSession().subscribe();
+      http.expectOne(ME_URL).flush(mockUser);
     });
 
     it('should set isAuthenticated to false', () => {
-      service.setAuthenticated(true);
-      service.setAuthenticated(false);
+      service.clearLocalSession();
       expect(service.isAuthenticated()).toBe(false);
     });
 
-    it('should emit the new value on isAuthenticated$', () => {
+    it('should set currentUser to null', () => {
+      service.clearLocalSession();
+      expect(service.currentUser).toBeNull();
+    });
+
+    it('should emit false on isAuthenticated$', () => {
       const emitted: boolean[] = [];
       service.isAuthenticated$.subscribe((v) => emitted.push(v));
-      service.setAuthenticated(true);
-      service.setAuthenticated(false);
-      expect(emitted).toEqual([false, true, false]);
+      service.clearLocalSession();
+      expect(emitted[emitted.length - 1]).toBe(false);
+    });
+
+    it('should emit null on currentUser$', () => {
+      const emitted: (CurrentUser | null)[] = [];
+      service.currentUser$.subscribe((v) => emitted.push(v));
+      service.clearLocalSession();
+      expect(emitted[emitted.length - 1]).toBeNull();
     });
   });
 
@@ -158,14 +171,16 @@ describe('AuthService', () => {
       expect(service.isAuthenticated()).toBe(false);
     });
 
-    it('should return true after setAuthenticated(true)', () => {
-      service.setAuthenticated(true);
+    it('should return true after a successful checkSession', () => {
+      service.checkSession().subscribe();
+      http.expectOne(ME_URL).flush(mockUser);
       expect(service.isAuthenticated()).toBe(true);
     });
 
-    it('should return false after setAuthenticated(false)', () => {
-      service.setAuthenticated(true);
-      service.setAuthenticated(false);
+    it('should return false after clearLocalSession', () => {
+      service.checkSession().subscribe();
+      http.expectOne(ME_URL).flush(mockUser);
+      service.clearLocalSession();
       expect(service.isAuthenticated()).toBe(false);
     });
   });
@@ -204,7 +219,8 @@ describe('AuthService', () => {
     });
 
     it('should set isAuthenticated to false on success', () => {
-      service.setAuthenticated(true);
+      service.checkSession().subscribe();
+      http.expectOne(ME_URL).flush(mockUser);
       service.logout();
       http.expectOne(LOGOUT_URL).flush({});
       expect(service.isAuthenticated()).toBe(false);
@@ -219,7 +235,8 @@ describe('AuthService', () => {
     });
 
     it('should set isAuthenticated to false even on HTTP error', () => {
-      service.setAuthenticated(true);
+      service.checkSession().subscribe();
+      http.expectOne(ME_URL).flush(mockUser);
       service.logout();
       http.expectOne(LOGOUT_URL).flush('error', { status: 500, statusText: 'Server Error' });
       expect(service.isAuthenticated()).toBe(false);

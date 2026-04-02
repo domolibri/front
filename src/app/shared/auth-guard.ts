@@ -7,8 +7,8 @@ export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  // Aguarda initialized$ emitir (após checkSession ou setAuthenticated).
-  // Com ReplaySubject(1), subscribers tardios recebem o último valor imediatamente,
+  // Aguarda initialized$ emitir (após checkSession). Com ReplaySubject(1),
+  // subscribers tardios recebem o último valor imediatamente,
   // sem disparar nova requisição HTTP.
   return auth.initialized$.pipe(
     take(1),

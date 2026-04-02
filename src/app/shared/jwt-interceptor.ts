@@ -19,7 +19,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   return next(secureReq).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
-        authService.setAuthenticated(false);
+        authService.clearLocalSession();
         // Do not redirect if already on public/auth pages
         const publicPaths = ['/', '/login', '/cadastro', '/esqueci-senha', '/redefinir-senha'];
         const isPublicPage =

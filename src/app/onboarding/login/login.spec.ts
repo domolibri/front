@@ -11,7 +11,7 @@ describe('Login', () => {
   let component: Login;
   let fixture: ComponentFixture<Login>;
   let onboardingMock: { login: ReturnType<typeof vi.fn>; resendVerificationEmail: ReturnType<typeof vi.fn> };
-  let authMock: { setAuthenticated: ReturnType<typeof vi.fn> };
+  let authMock: { checkSession: ReturnType<typeof vi.fn> };
   let snackbarMock: { show: ReturnType<typeof vi.fn> };
   let routerNavigateSpy: ReturnType<typeof vi.fn>;
 
@@ -20,7 +20,7 @@ describe('Login', () => {
       login: vi.fn().mockReturnValue(of({ token: 'tok', message: 'OK' })),
       resendVerificationEmail: vi.fn().mockReturnValue(of({ message: 'Reenviado' })),
     };
-    authMock = { setAuthenticated: vi.fn() };
+    authMock = { checkSession: vi.fn().mockReturnValue(of(true)) };
     snackbarMock = { show: vi.fn() };
 
     await TestBed.configureTestingModule({
@@ -104,9 +104,9 @@ describe('Login', () => {
         expect(onboardingMock.login).toHaveBeenCalledWith('user@test.com', 'senha123');
       });
 
-      it('should call auth.setAuthenticated(true)', () => {
+      it('should call auth.checkSession() after login', () => {
         component.onSubmit();
-        expect(authMock.setAuthenticated).toHaveBeenCalledWith(true);
+        expect(authMock.checkSession).toHaveBeenCalled();
       });
 
       it('should navigate to /dashboard', () => {

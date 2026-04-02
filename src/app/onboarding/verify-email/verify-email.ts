@@ -34,7 +34,7 @@ export class VerifyEmail implements OnInit, OnDestroy {
     this.onboarding.verifyEmail(email, token).subscribe({
       next: () => {
         this.status = 'success';
-        this.auth.setAuthenticated(true);
+        this.auth.checkSession().subscribe();
         this.startCountdown();
       },
       error: (err) => {

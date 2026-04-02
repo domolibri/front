@@ -10,7 +10,7 @@ describe('VerifyEmail', () => {
   let component: VerifyEmail;
   let fixture: ComponentFixture<VerifyEmail>;
   let onboardingMock: { verifyEmail: ReturnType<typeof vi.fn> };
-  let authMock: { setAuthenticated: ReturnType<typeof vi.fn> };
+  let authMock: { checkSession: ReturnType<typeof vi.fn> };
   let routerNavigateSpy: ReturnType<typeof vi.fn>;
 
   // Mutable params: update before calling fixture.detectChanges() in each test.
@@ -30,7 +30,7 @@ describe('VerifyEmail', () => {
     // Default: valid params + success response
     mockParams = { email: 'user@test.com', token: 'tok123' };
     onboardingMock = { verifyEmail: vi.fn().mockReturnValue(of({ message: 'Verificado' })) };
-    authMock = { setAuthenticated: vi.fn() };
+    authMock = { checkSession: vi.fn().mockReturnValue(of(true)) };
 
     await TestBed.configureTestingModule({
       imports: [VerifyEmail],
@@ -118,9 +118,9 @@ describe('VerifyEmail', () => {
       expect(component.status).toBe('success');
     });
 
-    it('should call auth.setAuthenticated(true)', () => {
+    it('should call auth.checkSession() on successful verification', () => {
       fixture.detectChanges();
-      expect(authMock.setAuthenticated).toHaveBeenCalledWith(true);
+      expect(authMock.checkSession).toHaveBeenCalled();
     });
 
     it('should initialise countdown at 3', () => {
@@ -169,9 +169,9 @@ describe('VerifyEmail', () => {
       });
     });
 
-    it('should NOT call auth.setAuthenticated', () => {
+    it('should NOT call auth.checkSession', () => {
       fixture.detectChanges();
-      expect(authMock.setAuthenticated).not.toHaveBeenCalled();
+      expect(authMock.checkSession).not.toHaveBeenCalled();
     });
   });
 

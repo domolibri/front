@@ -11,7 +11,7 @@ describe('Register', () => {
   let component: Register;
   let fixture: ComponentFixture<Register>;
   let onboardingMock: { registerEditora: ReturnType<typeof vi.fn> };
-  let authMock: { setAuthenticated: ReturnType<typeof vi.fn> };
+  let authMock: Record<string, never>;
   let snackbarMock: { show: ReturnType<typeof vi.fn> };
   let routerNavigateSpy: ReturnType<typeof vi.fn>;
 
@@ -26,7 +26,7 @@ describe('Register', () => {
     onboardingMock = {
       registerEditora: vi.fn().mockReturnValue(of({ editoraId: 'id-1', message: 'Criado' })),
     };
-    authMock = { setAuthenticated: vi.fn() };
+    authMock = {};
     snackbarMock = { show: vi.fn() };
 
     await TestBed.configureTestingModule({

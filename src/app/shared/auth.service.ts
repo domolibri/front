@@ -17,7 +17,8 @@ export class AuthService {
   private _currentUser$ = new BehaviorSubject<CurrentUser | null>(null);
 
   // Emite true/false quando a verificação de sessão conclui (replay para subscribers tardios).
-  // Atualizado tanto pelo checkSession() quanto pelo setAuthenticated() após login manual.
+  // Atualizado apenas por checkSession(). Com ReplaySubject(1), subscribers tardios
+  // recebem o último valor sem disparar nova requisição.
   private _initialized$ = new ReplaySubject<boolean>(1);
 
   isAuthenticated$ = this._isAuthenticated$.asObservable();
@@ -42,8 +43,9 @@ export class AuthService {
     );
   }
 
-  setAuthenticated(status: boolean): void {
-    this._isAuthenticated$.next(status);
+  clearLocalSession(): void {
+    this._isAuthenticated$.next(false);
+    this._currentUser$.next(null);
   }
 
   isAuthenticated(): boolean {
