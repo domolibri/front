@@ -1,26 +1,39 @@
 import { Routes } from '@angular/router';
-import { Home } from './home/home';
-import { Register } from './onboarding/register/register';
-import { RegisterSuccess } from './onboarding/register-success/register-success';
-import { Dashboard } from './onboarding/dashboard/dashboard';
-import { Login } from './onboarding/login/login';
-import { VerifyEmail } from './onboarding/verify-email/verify-email';
-import { VerifyEmailFailed } from './onboarding/verify-email-failed/verify-email-failed';
-import { ForgotPassword } from './onboarding/forgot-password/forgot-password';
-import { ResetPassword } from './onboarding/reset-password/reset-password';
-import { Branding } from './onboarding/branding/branding';
 import { authGuard } from './shared/auth-guard';
 
 export const routes: Routes = [
-  { path: '', component: Home },
-  { path: 'login', component: Login },
-  { path: 'cadastro', component: Register },
-  { path: 'cadastro/sucesso', component: RegisterSuccess },
-  { path: 'onboarding/verify-email', component: VerifyEmail },
-  { path: 'onboarding/verify-email-failed', component: VerifyEmailFailed },
-  { path: 'esqueci-senha', component: ForgotPassword },
-  { path: 'redefinir-senha', component: ResetPassword },
-  { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },
-  { path: 'branding', component: Branding, canActivate: [authGuard] },
+  { path: '', loadComponent: () => import('./home/home').then((m) => m.Home) },
+  { path: 'login', loadComponent: () => import('./onboarding/login/login').then((m) => m.Login) },
+  { path: 'cadastro', loadComponent: () => import('./onboarding/register/register').then((m) => m.Register) },
+  {
+    path: 'cadastro/sucesso',
+    loadComponent: () => import('./onboarding/register-success/register-success').then((m) => m.RegisterSuccess),
+  },
+  {
+    path: 'onboarding/verify-email',
+    loadComponent: () => import('./onboarding/verify-email/verify-email').then((m) => m.VerifyEmail),
+  },
+  {
+    path: 'onboarding/verify-email-failed',
+    loadComponent: () => import('./onboarding/verify-email-failed/verify-email-failed').then((m) => m.VerifyEmailFailed),
+  },
+  {
+    path: 'esqueci-senha',
+    loadComponent: () => import('./onboarding/forgot-password/forgot-password').then((m) => m.ForgotPassword),
+  },
+  {
+    path: 'redefinir-senha',
+    loadComponent: () => import('./onboarding/reset-password/reset-password').then((m) => m.ResetPassword),
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () => import('./onboarding/dashboard/dashboard').then((m) => m.Dashboard),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'branding',
+    loadComponent: () => import('./onboarding/branding/branding').then((m) => m.Branding),
+    canActivate: [authGuard],
+  },
   { path: '**', redirectTo: '' },
 ];
