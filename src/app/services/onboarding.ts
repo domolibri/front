@@ -36,6 +36,11 @@ export class EmailNotVerifiedError extends Error {
   }
 }
 
+export interface BrandingResponse {
+  logoUrl: string | null;
+  corPrimaria: string | null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -75,6 +80,10 @@ export class Onboarding {
 
   resetPassword(email: string, token: string, novaSenha: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.baseUrl}/reset-password`, { email, token, novaSenha });
+  }
+
+  getBranding(): Observable<BrandingResponse> {
+    return this.http.get<BrandingResponse>(`${environment.apiUrl}/api/editora/branding`);
   }
 
   updateBranding(corPrimaria: string, logoFile: File | null): Observable<any> {

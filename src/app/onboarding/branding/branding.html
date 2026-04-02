@@ -16,7 +16,8 @@
             class="branding__color-input"
             type="color"
             id="corPrimaria"
-            [(ngModel)]="corPrimaria"
+            [value]="corPrimaria"
+            (input)="corPrimaria = $any($event.target).value"
             name="corPrimaria"
           />
           <span class="branding__color-swatch" [style.background]="corPrimaria"></span>
@@ -31,6 +32,17 @@
         <label class="branding__label">Logotipo</label>
         <p class="branding__hint">Formatos aceitos: PNG, JPG, SVG. Tamanho recomendado: 400 × 120 px.</p>
 
+        @if (carregandoLogo) {
+          <div class="branding__loading">Carregando logo atual...</div>
+        } @else if (logoUrlAtual && !imagemPreview) {
+          <div class="branding__preview branding__preview--current">
+            <p class="branding__preview-label">Logo atual</p>
+            <div class="branding__preview-frame">
+              <img class="branding__preview-img" [src]="logoUrlAtual" alt="Logo atual" />
+            </div>
+          </div>
+        }
+
         <label class="branding__upload" for="logoInput">
           <svg class="branding__upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -39,7 +51,7 @@
             <line x1="12" y1="3" x2="12" y2="15" />
           </svg>
           <span class="branding__upload-text">
-            {{ arquivoLogo ? arquivoLogo.name : 'Clique para selecionar uma imagem' }}
+            {{ arquivoLogo ? arquivoLogo.name : (logoUrlAtual ? 'Clique para substituir a imagem' : 'Clique para selecionar uma imagem') }}
           </span>
           <input
             class="branding__upload-input"
@@ -61,6 +73,7 @@
       </div>
 
       <div class="branding__actions">
+        <button class="branding__btn branding__btn--secondary" type="button" (click)="voltar()">Voltar</button>
         <button class="branding__btn" type="submit">Salvar configurações</button>
       </div>
 
