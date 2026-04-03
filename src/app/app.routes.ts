@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './shared/auth-guard';
+import { AppShell } from './shared/app-shell/app-shell';
 
 export const routes: Routes = [
   { path: '', loadComponent: () => import('./home/home').then((m) => m.Home) },
@@ -26,14 +27,19 @@ export const routes: Routes = [
     loadComponent: () => import('./onboarding/reset-password/reset-password').then((m) => m.ResetPassword),
   },
   {
-    path: 'dashboard',
-    loadComponent: () => import('./onboarding/dashboard/dashboard').then((m) => m.Dashboard),
+    path: '',
+    component: AppShell,
     canActivate: [authGuard],
-  },
-  {
-    path: 'branding',
-    loadComponent: () => import('./onboarding/branding/branding').then((m) => m.Branding),
-    canActivate: [authGuard],
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./onboarding/dashboard/dashboard').then((m) => m.Dashboard),
+      },
+      {
+        path: 'branding',
+        loadComponent: () => import('./onboarding/branding/branding').then((m) => m.Branding),
+      },
+    ],
   },
   { path: '**', redirectTo: '' },
 ];

@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { AsyncPipe, NgTemplateOutlet, UpperCasePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { AuthService } from '../../shared/auth.service';
 
 interface DashboardCard {
@@ -14,19 +14,13 @@ interface DashboardCard {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, AsyncPipe, NgTemplateOutlet, UpperCasePipe],
+  imports: [RouterLink, AsyncPipe, NgTemplateOutlet],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
   protected readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
-
-  protected logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/']);
-  }
 
   protected get cards(): DashboardCard[] {
     const brandingConfigurado = this.auth.currentUser?.brandingConfigurado ?? false;

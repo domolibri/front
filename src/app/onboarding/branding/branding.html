@@ -5,7 +5,7 @@
   </div>
 
   <div class="branding__card">
-    <form class="branding__form" (ngSubmit)="salvarBranding()">
+    <form class="branding__form" (submit)="$event.preventDefault(); salvarBranding()">
 
       <!-- Cor primária -->
       <div class="branding__field">

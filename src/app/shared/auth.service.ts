@@ -10,6 +10,8 @@ export interface CurrentUser {
   nome: string;
   nomeEditora?: string;
   brandingConfigurado?: boolean;
+  logoUrl?: string | null;
+  corPrimaria?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -36,6 +38,7 @@ export class AuthService {
       tap((user) => {
         this._currentUser$.next(user);
         this._isAuthenticated$.next(true);
+        this.applyBranding(user.corPrimaria ?? null);
       }),
       map((): boolean => true),
       catchError(() => {
@@ -47,9 +50,18 @@ export class AuthService {
     );
   }
 
+  private applyBranding(corPrimaria: string | null): void {
+    if (corPrimaria) {
+      document.documentElement.style.setProperty('--cor-primaria', corPrimaria);
+    } else {
+      document.documentElement.style.removeProperty('--cor-primaria');
+    }
+  }
+
   clearLocalSession(): void {
     this._isAuthenticated$.next(false);
     this._currentUser$.next(null);
+    document.documentElement.style.removeProperty('--cor-primaria');
   }
 
   isAuthenticated(): boolean {
