@@ -1,5 +1,7 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { switchMap, tap } from 'rxjs';
 import { Onboarding } from '../../services/onboarding';
 import { AuthService } from '../../shared/auth.service';
 
@@ -19,6 +21,7 @@ export class VerifyEmail implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly onboarding = inject(Onboarding);
   private readonly auth = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
 
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -31,18 +34,25 @@ export class VerifyEmail implements OnInit, OnDestroy {
       return;
     }
 
-    this.onboarding.verifyEmail(email, token).subscribe({
-      next: () => {
-        this.status = 'success';
-        this.auth.checkSession().subscribe();
-        this.startCountdown();
-      },
-      error: (err) => {
-        this.navigateToFailure(
-          err?.error?.detail ?? 'Não foi possível verificar o seu e-mail. O link pode ter expirado.',
-        );
-      },
-    });
+    this.onboarding
+      .verifyEmail(email, token)
+      .pipe(
+        // Atualiza o estado da view imediatamente e inicia o countdown
+        // antes de aguardar o checkSession — mantém a UX responsiva.
+        tap(() => {
+          this.status = 'success';
+          this.startCountdown();
+        }),
+        switchMap(() => this.auth.checkSession()),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        error: (err) => {
+          this.navigateToFailure(
+            err?.error?.detail ?? 'Não foi possível verificar o seu e-mail. O link pode ter expirado.',
+          );
+        },
+      });
   }
 
   ngOnDestroy(): void {

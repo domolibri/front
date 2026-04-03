@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Onboarding } from '../../services/onboarding';
@@ -14,6 +15,8 @@ export class ForgotPassword {
   form: FormGroup;
   isLoading = false;
   submitted = false;
+
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private fb: FormBuilder,
@@ -36,16 +39,19 @@ export class ForgotPassword {
 
     this.isLoading = true;
 
-    this.onboarding.forgotPassword(this.form.value.email).subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.submitted = true;
-      },
-      error: () => {
-        // Always show success to avoid e-mail enumeration
-        this.isLoading = false;
-        this.submitted = true;
-      },
-    });
+    this.onboarding
+      .forgotPassword(this.form.value.email)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.submitted = true;
+        },
+        error: () => {
+          // Always show success to avoid e-mail enumeration
+          this.isLoading = false;
+          this.submitted = true;
+        },
+      });
   }
 }

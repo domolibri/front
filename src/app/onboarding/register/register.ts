@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -18,6 +19,8 @@ export class Register {
   isLoading = false;
   errorMessage = '';
   fieldErrors: Record<string, string> = {};
+
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private fb: FormBuilder,
@@ -59,28 +62,31 @@ export class Register {
     this.errorMessage = '';
     this.fieldErrors = {};
 
-    this.onboarding.registerEditora(this.form.value).subscribe({
-      next: (res) => {
-        this.isLoading = false;
-        // Token is no longer returned on registration. User must verify email.
-        this.router.navigate(['/cadastro/sucesso'], {
-          queryParams: { email: this.form.value.emailAdmin },
-        });
-      },
-      error: (err: HttpErrorResponse) => {
-        this.isLoading = false;
-        if (err.status === 400) {
-          const apiErrors: Record<string, string[]> = err.error?.errors ?? {};
-          for (const [field, messages] of Object.entries(apiErrors)) {
-            const key = field.charAt(0).toLowerCase() + field.slice(1);
-            this.fieldErrors[key] = Array.isArray(messages) ? messages[0] : messages;
+    this.onboarding
+      .registerEditora(this.form.value)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.isLoading = false;
+          // Token is no longer returned on registration. User must verify email.
+          this.router.navigate(['/cadastro/sucesso'], {
+            queryParams: { email: this.form.value.emailAdmin },
+          });
+        },
+        error: (err: HttpErrorResponse) => {
+          this.isLoading = false;
+          if (err.status === 400) {
+            const apiErrors: Record<string, string[]> = err.error?.errors ?? {};
+            for (const [field, messages] of Object.entries(apiErrors)) {
+              const key = field.charAt(0).toLowerCase() + field.slice(1);
+              this.fieldErrors[key] = Array.isArray(messages) ? messages[0] : messages;
+            }
+          } else if (err.status === 409 || err.status === 422) {
+            this.errorMessage = err.error?.detail ?? err.error?.title ?? 'Operação não permitida.';
+          } else {
+            this.snackbar.show('Erro inesperado. Tente novamente.', 'error');
           }
-        } else if (err.status === 409 || err.status === 422) {
-          this.errorMessage = err.error?.detail ?? err.error?.title ?? 'Operação não permitida.';
-        } else {
-          this.snackbar.show('Erro inesperado. Tente novamente.', 'error');
-        }
-      },
-    });
+        },
+      });
   }
 }

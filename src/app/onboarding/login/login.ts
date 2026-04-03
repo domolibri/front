@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { switchMap } from 'rxjs';
 import { EmailNotVerifiedError, Onboarding } from '../../services/onboarding';
 import { AuthService } from '../../shared/auth.service';
 import { SnackbarService } from '../../shared/snackbar.service';
@@ -22,6 +24,8 @@ export class Login {
   isResending = false;
   resendSuccess = false;
   resendError = '';
+
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private fb: FormBuilder,
@@ -54,27 +58,29 @@ export class Login {
 
     const { email, senha } = this.form.value;
 
-    this.onboarding.login(email, senha).subscribe({
-      next: () => {
-        // Busca os dados da sessão após login para popular currentUser$
-        // antes de navegar — garante que topbar e módulos apareçam juntos.
-        this.auth.checkSession().subscribe((authenticated) => {
+    this.onboarding
+      .login(email, senha)
+      .pipe(
+        switchMap(() => this.auth.checkSession()),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (authenticated) => {
           this.isLoading = false;
           this.router.navigate([authenticated ? '/dashboard' : '/']);
-        });
-      },
-      error: (err) => {
-        this.isLoading = false;
-        if (err instanceof EmailNotVerifiedError) {
-          this.emailNotVerified = true;
-          this.unverifiedEmail = email;
-        } else if (err instanceof HttpErrorResponse && err.status === 401) {
-          this.errorMessage = 'E-mail ou senha incorretos.';
-        } else {
-          this.snackbar.show('Erro inesperado. Tente novamente.', 'error');
-        }
-      },
-    });
+        },
+        error: (err) => {
+          this.isLoading = false;
+          if (err instanceof EmailNotVerifiedError) {
+            this.emailNotVerified = true;
+            this.unverifiedEmail = email;
+          } else if (err instanceof HttpErrorResponse && err.status === 401) {
+            this.errorMessage = 'E-mail ou senha incorretos.';
+          } else {
+            this.snackbar.show('Erro inesperado. Tente novamente.', 'error');
+          }
+        },
+      });
   }
 
   resendVerification(): void {
@@ -83,15 +89,18 @@ export class Login {
     this.resendSuccess = false;
     this.resendError = '';
 
-    this.onboarding.resendVerificationEmail(this.unverifiedEmail).subscribe({
-      next: () => {
-        this.isResending = false;
-        this.resendSuccess = true;
-      },
-      error: () => {
-        this.isResending = false;
-        this.resendError = 'Não foi possível reenviar. Tente novamente.';
-      },
-    });
+    this.onboarding
+      .resendVerificationEmail(this.unverifiedEmail)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isResending = false;
+          this.resendSuccess = true;
+        },
+        error: () => {
+          this.isResending = false;
+          this.resendError = 'Não foi possível reenviar. Tente novamente.';
+        },
+      });
   }
 }

@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { AuthService, CurrentUser } from './auth.service';
+import { SnackbarService } from './snackbar.service';
 import { environment } from '../../environments/environment';
 
 const ME_URL = `${environment.apiUrl}/api/auth/me`;
@@ -11,13 +12,15 @@ const mockUser: CurrentUser = { tenantId: 'tenant-abc', email: 'test@test.com', 
 describe('AuthService', () => {
   let service: AuthService;
   let http: HttpTestingController;
+  let snackbar: SnackbarService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [AuthService, provideHttpClient(), provideHttpClientTesting()],
+      providers: [AuthService, SnackbarService, provideHttpClient(), provideHttpClientTesting()],
     });
     service = TestBed.inject(AuthService);
     http = TestBed.inject(HttpTestingController);
+    snackbar = TestBed.inject(SnackbarService);
   });
 
   afterEach(() => http.verify());
@@ -248,6 +251,20 @@ describe('AuthService', () => {
       service.logout();
       http.expectOne(LOGOUT_URL).flush('error', { status: 500, statusText: 'Server Error' });
       expect(service.currentUser).toBeNull();
+    });
+
+    it('should show an error snackbar when the server logout request fails', () => {
+      const showSpy = vi.spyOn(snackbar, 'show');
+      service.logout();
+      http.expectOne(LOGOUT_URL).flush('error', { status: 500, statusText: 'Server Error' });
+      expect(showSpy).toHaveBeenCalledWith(expect.any(String), 'error');
+    });
+
+    it('should NOT show a snackbar on successful logout', () => {
+      const showSpy = vi.spyOn(snackbar, 'show');
+      service.logout();
+      http.expectOne(LOGOUT_URL).flush({});
+      expect(showSpy).not.toHaveBeenCalled();
     });
   });
 });

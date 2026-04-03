@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -31,6 +32,7 @@ export class ResetPassword implements OnInit {
 
   private email = '';
   private token = '';
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private fb: FormBuilder,
@@ -78,16 +80,19 @@ export class ResetPassword implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.onboarding.resetPassword(this.email, this.token, this.form.value.novaSenha).subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.success = true;
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.errorMessage =
-          err?.error?.detail ?? 'Link inválido ou expirado. Solicite um novo link.';
-      },
-    });
+    this.onboarding
+      .resetPassword(this.email, this.token, this.form.value.novaSenha)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.success = true;
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMessage =
+            err?.error?.detail ?? 'Link inválido ou expirado. Solicite um novo link.';
+        },
+      });
   }
 }

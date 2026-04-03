@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, ReplaySubject, tap, map, catchError, of } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, tap, map, catchError, of, finalize } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { SnackbarService } from './snackbar.service';
 
 export interface CurrentUser {
   tenantId: string;
@@ -25,7 +26,10 @@ export class AuthService {
   currentUser$ = this._currentUser$.asObservable();
   initialized$ = this._initialized$.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private snackbar: SnackbarService,
+  ) {}
 
   checkSession(): Observable<boolean> {
     return this.http.get<CurrentUser>(`${environment.apiUrl}/api/auth/me`).pipe(
@@ -57,15 +61,18 @@ export class AuthService {
   }
 
   logout(): void {
-    this.http.post(`${environment.apiUrl}/api/auth/logout`, {}).subscribe({
-      next: () => {
-        this._isAuthenticated$.next(false);
-        this._currentUser$.next(null);
-      },
-      error: () => {
-        this._isAuthenticated$.next(false);
-        this._currentUser$.next(null);
-      },
-    });
+    this.http
+      .post(`${environment.apiUrl}/api/auth/logout`, {})
+      .pipe(
+        catchError(() => {
+          this.snackbar.show(
+            'Não foi possível encerrar a sessão no servidor. Tente novamente.',
+            'error',
+          );
+          return of(null);
+        }),
+        finalize(() => this.clearLocalSession()),
+      )
+      .subscribe();
   }
 }

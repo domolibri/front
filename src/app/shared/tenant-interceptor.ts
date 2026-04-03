@@ -1,21 +1,28 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
+import { safeInject } from './safe-inject';
 
 /**
  * Interceptor para injetar o contexto do Tenant (cliente) em todas as requisições.
- * Em um cenário SaaS real, o ID do tenant seria extraído do subdomínio ou do storage.
+ * O tenantId é obtido do estado do AuthService, preenchido após o login.
  */
 export const tenantInterceptor: HttpInterceptorFn = (req, next) => {
-  // Ignora requisições fora da nossa API (ex: assets externos)
   if (!req.url.startsWith(environment.apiUrl) && !req.url.startsWith('/api')) {
     return next(req);
   }
 
-  // Tenta obter o tenantId (exemplo vindo do localStorage para POC, 
-  // mas idealmente deveria ser extraído do subdomínio de forma segura)
-  const tenantId = localStorage.getItem('tenant_id');
+  const authService = safeInject(AuthService, 'tenantInterceptor');
 
-  if (tenantId) {
+  if (!authService) {
+    // DI failed — forward the request without the tenant header.
+    // The API will reject unauthorized requests normally.
+    return next(req);
+  }
+
+  const tenantId = authService.currentUser?.tenantId;
+
+  if (authService.isAuthenticated() && tenantId) {
     const tenantReq = req.clone({
       headers: req.headers.set('X-Tenant-ID', tenantId),
     });

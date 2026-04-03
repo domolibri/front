@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AsyncPipe, NgTemplateOutlet, UpperCasePipe } from '@angular/common';
 import { AuthService } from '../../shared/auth.service';
@@ -17,6 +17,7 @@ interface DashboardCard {
   imports: [RouterLink, AsyncPipe, NgTemplateOutlet, UpperCasePipe],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
   protected readonly auth = inject(AuthService);
