@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, DestroyR
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { switchMap, tap } from 'rxjs';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { Onboarding } from '../../services/onboarding';
 import { AuthService } from '../../shared/auth.service';
 
@@ -18,10 +19,11 @@ export class Branding implements OnInit {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly sanitizer = inject(DomSanitizer);
 
   corPrimaria = '#0078D4';
   arquivoLogo: File | null = null;
-  imagemPreview: string | ArrayBuffer | null = null;
+  imagemPreview: SafeUrl | null = null;
   logoUrlAtual: string | null = null;
   carregandoLogo = false;
 
@@ -53,7 +55,7 @@ export class Branding implements OnInit {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        this.imagemPreview = reader.result;
+        this.imagemPreview = this.sanitizer.bypassSecurityTrustUrl(reader.result as string);
         this.cdr.markForCheck();
       };
       reader.readAsDataURL(file);

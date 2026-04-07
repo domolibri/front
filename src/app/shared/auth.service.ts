@@ -12,6 +12,8 @@ export interface CurrentUser {
   brandingConfigurado?: boolean;
   logoUrl?: string | null;
   corPrimaria?: string | null;
+  permissions?: string[];
+  roles?: string[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -27,6 +29,9 @@ export class AuthService {
   isAuthenticated$ = this._isAuthenticated$.asObservable();
   currentUser$ = this._currentUser$.asObservable();
   initialized$ = this._initialized$.asObservable();
+
+  /** Emite a lista de códigos de permissão do usuário atual. */
+  permissions$ = this._currentUser$.pipe(map((user) => user?.permissions ?? []));
 
   constructor(
     private http: HttpClient,
@@ -70,6 +75,11 @@ export class AuthService {
 
   get currentUser(): CurrentUser | null {
     return this._currentUser$.value;
+  }
+
+  /** Returns true if the current user holds the given permission code. */
+  hasPermission(code: string): boolean {
+    return this._currentUser$.value?.permissions?.includes(code) ?? false;
   }
 
   logout(): void {

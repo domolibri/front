@@ -267,4 +267,51 @@ describe('AuthService', () => {
       expect(showSpy).not.toHaveBeenCalled();
     });
   });
+
+  // ─── permissions$ ─────────────────────────────────────────────────────────
+
+  describe('permissions$', () => {
+    it('should emit an empty array when user has no permissions', () => {
+      service.checkSession().subscribe();
+      http.expectOne(ME_URL).flush({ ...mockUser, permissions: undefined });
+      const emitted: string[][] = [];
+      service.permissions$.subscribe((perms) => emitted.push(perms));
+      expect(emitted[emitted.length - 1]).toEqual([]);
+    });
+
+    it('should emit the permissions array from the current user', () => {
+      service.checkSession().subscribe();
+      http.expectOne(ME_URL).flush({ ...mockUser, permissions: ['usuarios.ler', 'obras.escrever'] });
+      const emitted: string[][] = [];
+      service.permissions$.subscribe((perms) => emitted.push(perms));
+      expect(emitted[emitted.length - 1]).toEqual(['usuarios.ler', 'obras.escrever']);
+    });
+  });
+
+  // ─── hasPermission() ──────────────────────────────────────────────────────
+
+  describe('hasPermission()', () => {
+    it('should return false when user is not authenticated', () => {
+      expect(service.hasPermission('usuarios.ler')).toBe(false);
+    });
+
+    it('should return true when user has the given permission', () => {
+      service.checkSession().subscribe();
+      http.expectOne(ME_URL).flush({ ...mockUser, permissions: ['usuarios.ler', 'obras.escrever'] });
+      expect(service.hasPermission('usuarios.ler')).toBe(true);
+    });
+
+    it('should return false when user does not have the given permission', () => {
+      service.checkSession().subscribe();
+      http.expectOne(ME_URL).flush({ ...mockUser, permissions: ['obras.escrever'] });
+      expect(service.hasPermission('usuarios.excluir')).toBe(false);
+    });
+
+    it('should return false after clearLocalSession', () => {
+      service.checkSession().subscribe();
+      http.expectOne(ME_URL).flush({ ...mockUser, permissions: ['usuarios.ler'] });
+      service.clearLocalSession();
+      expect(service.hasPermission('usuarios.ler')).toBe(false);
+    });
+  });
 });
