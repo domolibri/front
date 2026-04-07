@@ -8,6 +8,7 @@ export interface RegisterEditoraRequest {
   emailAdmin: string;
   senha: string;
   nomeAdmin: string;
+  aceitouTermos: boolean;
 }
 
 export interface RegisterEditoraResponse {

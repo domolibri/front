@@ -41,6 +41,7 @@ export class Register {
           Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/),
         ],
       ],
+      aceitouTermos: [false, [Validators.requiredTrue]],
     });
   }
 

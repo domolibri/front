@@ -91,6 +91,25 @@
         }
       </div>
 
+      <div class="form-group form-group--checkbox">
+        <label class="checkbox-label" [class.is-invalid]="f['aceitouTermos'].touched && f['aceitouTermos'].errors?.['required']">
+          <input
+            id="aceitouTermos"
+            type="checkbox"
+            formControlName="aceitouTermos"
+          />
+          <span>
+            Aceito os
+            <a href="/termos-de-uso" target="_blank" rel="noopener noreferrer" class="terms-link">Termos de Uso</a>
+            e a
+            <a href="/politica-de-privacidade" target="_blank" rel="noopener noreferrer" class="terms-link">Política de Privacidade</a>
+          </span>
+        </label>
+        @if (f['aceitouTermos'].touched && f['aceitouTermos'].errors?.['required']) {
+          <span class="form-error">Você deve aceitar os Termos de Uso para prosseguir.</span>
+        }
+      </div>
+
       @if (errorMessage) {
         <div class="form-alert form-alert--error">{{ errorMessage }}</div>
       }
