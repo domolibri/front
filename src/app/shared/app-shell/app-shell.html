@@ -1,26 +1,37 @@
 <div class="shell">
   <header class="shell__topbar">
-    <div class="shell__topbar-brand">
-      @if ((auth.currentUser$ | async)?.logoUrl; as logoUrl) {
-        <img class="shell__topbar-logo-img" [src]="logoUrl" alt="Logo da editora" />
-      } @else {
-        <span class="shell__topbar-logo">📚</span>
-      }
-      <span class="shell__topbar-name">SaaS Editorial</span>
-    </div>
     @if (auth.currentUser$ | async; as user) {
-    <div class="shell__topbar-user">
-      <span class="shell__topbar-avatar">{{ (user.nome || '?')[0] | uppercase }}</span>
-      <span class="shell__topbar-username">{{ user.nome || 'Usuário' }}</span>
-      <button class="shell__topbar-logout" (click)="logout()" title="Sair">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <polyline points="16 17 21 12 16 7" />
-          <line x1="21" y1="12" x2="9" y2="12" />
-        </svg>
-      </button>
-    </div>
+      <div class="shell__topbar-brand">
+        @if (user.logoUrl) {
+          <img class="shell__topbar-logo-img" [src]="user.logoUrl" alt="Logo da editora" />
+        } @else {
+          <span class="shell__topbar-logo">📚</span>
+        }
+        <span class="shell__topbar-name">{{ user.nomeEditora || 'SaaS Editorial' }}</span>
+      </div>
+
+      <div class="shell__topbar-user">
+        <span class="shell__topbar-avatar">{{ (user.nome || '?')[0] | uppercase }}</span>
+        <div class="shell__topbar-user-info">
+          <span class="shell__topbar-username">{{ user.nome || 'Usuário' }}</span>
+          @if (user.roles?.length) {
+            <span class="shell__topbar-role">{{ user.roles!.join(', ') }}</span>
+          }
+        </div>
+        <button class="shell__topbar-logout" (click)="logout()" title="Sair">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        </button>
+      </div>
+    } @else {
+      <div class="shell__topbar-brand">
+        <span class="shell__topbar-logo">📚</span>
+        <span class="shell__topbar-name">SaaS Editorial</span>
+      </div>
     }
   </header>
 
