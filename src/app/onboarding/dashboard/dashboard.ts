@@ -1,7 +1,9 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { AuthService } from '../../shared/auth.service';
+import { UserService, Role } from '../../shared/user.service';
+import { InviteModal } from '../../shared/invite-modal/invite-modal';
 
 interface DashboardCard {
   title: string;
@@ -14,13 +16,32 @@ interface DashboardCard {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, AsyncPipe, NgTemplateOutlet],
+  imports: [RouterLink, AsyncPipe, NgTemplateOutlet, InviteModal],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
   protected readonly auth = inject(AuthService);
+  private readonly userService = inject(UserService);
+
+  protected showInviteModal = signal(false);
+  protected roles = signal<Role[]>([]);
+
+  ngOnInit(): void {
+    this.userService.getRoles().subscribe({
+      next: (roles) => this.roles.set(roles),
+      error: () => { /* roles stay empty; modal will show an empty select */ },
+    });
+  }
+
+  protected openInviteModal(): void {
+    this.showInviteModal.set(true);
+  }
+
+  protected closeInviteModal(): void {
+    this.showInviteModal.set(false);
+  }
 
   protected get cards(): DashboardCard[] {
     const brandingConfigurado = this.auth.currentUser?.brandingConfigurado ?? false;

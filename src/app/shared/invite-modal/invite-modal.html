@@ -1,0 +1,70 @@
+<div class="invite-modal__backdrop" (click)="onBackdropClick($event)" role="dialog" aria-modal="true" aria-labelledby="invite-modal-title">
+  <div class="invite-modal__panel">
+
+    <div class="invite-modal__header">
+      <h2 class="invite-modal__title" id="invite-modal-title">Convidar Colega</h2>
+      <button type="button" class="invite-modal__close" (click)="close()" aria-label="Fechar">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <p class="invite-modal__desc">
+      Envie um link de acesso para um novo membro da equipe. O convite expira em 48 horas.
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="invite-modal__form" novalidate>
+
+      <div class="form-group">
+        <label for="invite-email">E-mail do convidado</label>
+        <input
+          id="invite-email"
+          type="email"
+          formControlName="email"
+          placeholder="colega@editora.com"
+          [class.is-invalid]="f['email'].invalid && f['email'].touched"
+          autocomplete="off"
+        />
+        @if (f['email'].touched && f['email'].errors?.['required']) {
+          <span class="form-error">E-mail é obrigatório.</span>
+        }
+        @if (f['email'].touched && f['email'].errors?.['email']) {
+          <span class="form-error">Informe um e-mail válido.</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="invite-role">Perfil de acesso</label>
+        <select
+          id="invite-role"
+          formControlName="roleId"
+          [class.is-invalid]="f['roleId'].invalid && f['roleId'].touched"
+        >
+          <option value="" disabled>Selecione um perfil…</option>
+          @for (role of roles(); track role.id) {
+            <option [value]="role.id">{{ role.nome }}</option>
+          }
+        </select>
+        @if (f['roleId'].touched && f['roleId'].errors?.['required']) {
+          <span class="form-error">Selecione um perfil de acesso.</span>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <div class="form-alert form-alert--error">{{ errorMessage() }}</div>
+      }
+
+      <div class="invite-modal__actions">
+        <button type="button" class="invite-modal__btn-cancel" (click)="close()">Cancelar</button>
+        <button type="submit" class="invite-modal__btn-submit" [disabled]="isLoading()">
+          {{ isLoading() ? 'Enviando…' : 'Enviar Convite' }}
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>

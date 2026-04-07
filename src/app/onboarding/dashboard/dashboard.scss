@@ -77,6 +77,42 @@
     }
   }
 
+  // ── Quick actions ─────────────────────────────────────────────
+
+  &__actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  &__invite-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--cor-primaria);
+    background: var(--cor-primaria-bg);
+    border: 1.5px solid var(--cor-primaria-alpha);
+    border-radius: 0.625rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+      stroke: var(--cor-primaria);
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      background: color-mix(in srgb, var(--cor-primaria) 12%, white);
+      border-color: var(--cor-primaria);
+      box-shadow: 0 2px 8px var(--cor-primaria-alpha);
+    }
+  }
+
   // ── Section ──────────────────────────────────────────────────
 
   &__section-title {
