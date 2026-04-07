@@ -21,7 +21,22 @@ export interface LoginRequest {
   senha: string;
 }
 
+export interface ContextoDisponivel {
+  vinculoId: string;
+  editoraId: string;
+  nomeEditora: string;
+  roles: string[];
+}
+
 export interface LoginResponse {
+  usuarioId: string;
+  nome: string;
+  email: string;
+  contextos: ContextoDisponivel[];
+  message: string;
+}
+
+export interface SelectContextResponse {
   token: string;
   message: string;
 }
@@ -65,6 +80,10 @@ export class Onboarding {
           return throwError(() => error);
         })
       );
+  }
+
+  selectContext(usuarioId: string, editoraId: string): Observable<SelectContextResponse> {
+    return this.http.post<SelectContextResponse>(`${this.baseUrl}/select-context`, { editoraId });
   }
 
   verifyEmail(email: string, token: string): Observable<VerifyEmailResponse> {

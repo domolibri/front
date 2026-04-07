@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { switchMap } from 'rxjs';
-import { EmailNotVerifiedError, Onboarding } from '../../services/onboarding';
+import { ContextoDisponivel, EmailNotVerifiedError, Onboarding } from '../../services/onboarding';
 import { AuthService } from '../../shared/auth.service';
 import { SnackbarService } from '../../shared/snackbar.service';
 
@@ -24,6 +24,11 @@ export class Login {
   isResending = false;
   resendSuccess = false;
   resendError = '';
+
+  // Two-step flow state
+  step: 'credentials' | 'select-context' = 'credentials';
+  contextos: ContextoDisponivel[] = [];
+  private pendingUsuarioId = '';
 
   private readonly destroyRef = inject(DestroyRef);
 
@@ -60,6 +65,41 @@ export class Login {
 
     this.onboarding
       .login(email, senha)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (result) => {
+          this.isLoading = false;
+          this.pendingUsuarioId = result.usuarioId;
+
+          if (result.contextos.length === 1) {
+            // Only one editora — auto-select it
+            this.selectContext(result.contextos[0].editoraId);
+          } else {
+            // Multiple editoras — show the context-selection step
+            this.contextos = result.contextos;
+            this.step = 'select-context';
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          if (err instanceof EmailNotVerifiedError) {
+            this.emailNotVerified = true;
+            this.unverifiedEmail = email;
+          } else if (err instanceof HttpErrorResponse && err.status === 401) {
+            this.errorMessage = 'E-mail ou senha incorretos.';
+          } else {
+            this.snackbar.show('Erro inesperado. Tente novamente.', 'error');
+          }
+        },
+      });
+  }
+
+  selectContext(editoraId: string): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.onboarding
+      .selectContext(this.pendingUsuarioId, editoraId)
       .pipe(
         switchMap(() => this.auth.checkSession()),
         takeUntilDestroyed(this.destroyRef),
@@ -71,11 +111,9 @@ export class Login {
         },
         error: (err) => {
           this.isLoading = false;
-          if (err instanceof EmailNotVerifiedError) {
-            this.emailNotVerified = true;
-            this.unverifiedEmail = email;
-          } else if (err instanceof HttpErrorResponse && err.status === 401) {
-            this.errorMessage = 'E-mail ou senha incorretos.';
+          if (err instanceof HttpErrorResponse && err.status === 401) {
+            this.errorMessage = 'Sessão expirada. Faça login novamente.';
+            this.step = 'credentials';
           } else {
             this.snackbar.show('Erro inesperado. Tente novamente.', 'error');
           }
