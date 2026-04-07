@@ -114,9 +114,9 @@
     transition: border-color 0.2s, background-color 0.2s;
 
     &:hover {
-      border-color: var(--cor-primaria, #4f46e5);
-      background-color: #f5f3ff;
-      color: var(--cor-primaria, #4f46e5);
+      border-color: var(--cor-primaria);
+      background-color: var(--cor-primaria-bg);
+      color: var(--cor-primaria);
     }
   }
 
@@ -203,7 +203,7 @@
 
   &__btn {
     padding: 0.7rem 1.5rem;
-    background-color: var(--cor-primaria, #4f46e5);
+    background-color: var(--cor-primaria);
     color: #fff;
     border: none;
     border-radius: 0.5rem;
@@ -213,26 +213,26 @@
     transition: background-color 0.2s, box-shadow 0.2s;
 
     &:hover {
-      background-color: color-mix(in srgb, var(--cor-primaria, #4f46e5) 85%, black);
-      box-shadow: 0 4px 12px color-mix(in srgb, var(--cor-primaria, #4f46e5) 30%, transparent);
+      background-color: var(--cor-primaria-hover);
+      box-shadow: 0 4px 12px var(--cor-primaria-shadow);
     }
 
     &:active {
-      background-color: #3730a3;
+      background-color: var(--cor-primaria-active);
     }
 
     &--secondary {
       background-color: transparent;
-      color: var(--cor-primaria, #4f46e5);
-      border: 1px solid var(--cor-primaria, #4f46e5);
+      color: var(--cor-primaria);
+      border: 1px solid var(--cor-primaria);
 
       &:hover {
-        background-color: #f5f3ff;
+        background-color: var(--cor-primaria-bg);
         box-shadow: none;
       }
 
       &:active {
-        background-color: #ede9fe;
+        background-color: var(--cor-primaria-alpha);
       }
     }
   }

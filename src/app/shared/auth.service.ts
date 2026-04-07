@@ -56,6 +56,11 @@ export class AuthService {
   }
 
   private applyBranding(corPrimaria: string | null): void {
+    // Setting only --cor-primaria is sufficient: the derived variables
+    // (--cor-primaria-hover, --cor-primaria-active, --cor-primaria-alpha,
+    //  --cor-primaria-shadow, --cor-primaria-bg) are declared in styles.scss
+    // using CSS color-mix() referencing var(--cor-primaria), so they
+    // recompute automatically whenever this property changes at runtime.
     if (corPrimaria) {
       document.documentElement.style.setProperty('--cor-primaria', corPrimaria);
     } else {

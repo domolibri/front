@@ -1,5 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 
 :root {
-  --cor-primaria: var(--cor-primaria, #4f46e5);
+  /* Default brand color – overridden at runtime via AuthService.applyBranding(). */
+  --cor-primaria: #4f46e5;
+
+  /* Derived palette – computed via color-mix, so they update automatically
+     whenever --cor-primaria is changed at runtime by JS. No extra JS needed. */
+  --cor-primaria-hover:  color-mix(in srgb, var(--cor-primaria) 85%, black);
+  --cor-primaria-active: color-mix(in srgb, var(--cor-primaria) 70%, black);
+  --cor-primaria-alpha:  color-mix(in srgb, var(--cor-primaria) 10%, transparent);
+  --cor-primaria-shadow: color-mix(in srgb, var(--cor-primaria) 30%, transparent);
+  --cor-primaria-bg:     color-mix(in srgb, var(--cor-primaria) 8%, white);
 }
