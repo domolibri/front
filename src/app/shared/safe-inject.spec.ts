@@ -13,13 +13,9 @@ describe('safeInject', () => {
   it('should return the service when the token is provided', () => {
     TestBed.configureTestingModule({ providers: [TestService] });
 
-    let result: TestService | null = null;
-    TestBed.runInInjectionContext(() => {
-      result = safeInject(TestService, 'test');
-    });
-
+    const result = TestBed.runInInjectionContext(() => safeInject(TestService, 'test'));
     expect(result).toBeInstanceOf(TestService);
-    expect(result?.value).toBe(42);
+    expect((result as TestService).value).toBe(42);
   });
 
   it('should return null when the token has no provider', () => {

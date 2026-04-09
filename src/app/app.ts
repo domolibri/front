@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SnackbarComponent } from './shared/snackbar.component';
 
@@ -6,6 +6,7 @@ import { SnackbarComponent } from './shared/snackbar.component';
   selector: 'app-root',
   imports: [RouterOutlet, SnackbarComponent],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {}

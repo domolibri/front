@@ -1,11 +1,13 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  DestroyRef,
   inject,
   input,
   output,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { UserService, Role } from '../user.service';
 import { SnackbarService } from '../snackbar.service';
@@ -26,6 +28,7 @@ export class InviteModal {
   private readonly userService = inject(UserService);
   private readonly snackbar = inject(SnackbarService);
   private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected isLoading = signal(false);
   protected errorMessage = signal<string | null>(null);
@@ -48,7 +51,9 @@ export class InviteModal {
 
     const { email, roleId } = this.form.value;
 
-    this.userService.inviteUser({ email: email!, roleId: roleId! }).subscribe({
+    this.userService.inviteUser({ email: email!, roleId: roleId! })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: () => {
         this.isLoading.set(false);
         this.snackbar.show(`Convite enviado para ${email}!`, 'success');

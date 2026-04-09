@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { switchMap, tap } from 'rxjs';
@@ -12,6 +12,7 @@ type VerifyStatus = 'verifying' | 'success';
   imports: [RouterLink],
   templateUrl: './verify-email.html',
   styleUrl: './verify-email.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VerifyEmail implements OnInit, OnDestroy {
   status: VerifyStatus = 'verifying';
@@ -21,6 +22,7 @@ export class VerifyEmail implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly onboarding = inject(Onboarding);
   private readonly auth = inject(AuthService);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
@@ -42,6 +44,7 @@ export class VerifyEmail implements OnInit, OnDestroy {
         tap(() => {
           this.status = 'success';
           this.startCountdown();
+          this.cdr.markForCheck();
         }),
         switchMap(() => this.auth.checkSession()),
         takeUntilDestroyed(this.destroyRef),
@@ -66,6 +69,7 @@ export class VerifyEmail implements OnInit, OnDestroy {
   private startCountdown(): void {
     this.countdownInterval = setInterval(() => {
       this.countdown--;
+      this.cdr.markForCheck();
       if (this.countdown <= 0) {
         this.clearCountdown();
         this.router.navigate(['/dashboard']);

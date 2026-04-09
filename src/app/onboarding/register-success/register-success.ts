@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 @Component({
@@ -6,6 +6,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
   imports: [RouterLink],
   templateUrl: './register-success.html',
   styleUrl: './register-success.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterSuccess implements OnInit {
   email = '';

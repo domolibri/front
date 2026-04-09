@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn } from '@angular/common/http';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
 import { tenantInterceptor } from './tenant-interceptor';
 import { AuthService } from './auth.service';
@@ -24,45 +24,39 @@ describe('tenantInterceptor', () => {
     expect(interceptor).toBeTruthy();
   });
 
-  it('should add X-Tenant-ID header when user is authenticated', (done) => {
+  it('should add X-Tenant-ID header when user is authenticated', async () => {
     TestBed.overrideProvider(AuthService, {
       useValue: makeAuthService(true, 'tenant-abc'),
     });
 
     const req = new HttpRequest('GET', '/api/resource');
-    TestBed.runInInjectionContext(() => tenantInterceptor(req, mockNext)).subscribe(
-      (passedReq: any) => {
-        expect(passedReq.headers.get('X-Tenant-ID')).toBe('tenant-abc');
-        done();
-      },
-    );
+    const passedReq = await firstValueFrom(
+      TestBed.runInInjectionContext(() => tenantInterceptor(req, mockNext)),
+    ) as any;
+    expect(passedReq.headers.get('X-Tenant-ID')).toBe('tenant-abc');
   });
 
-  it('should NOT add X-Tenant-ID header when user is not authenticated', (done) => {
+  it('should NOT add X-Tenant-ID header when user is not authenticated', async () => {
     TestBed.overrideProvider(AuthService, {
       useValue: makeAuthService(false),
     });
 
     const req = new HttpRequest('GET', '/api/resource');
-    TestBed.runInInjectionContext(() => tenantInterceptor(req, mockNext)).subscribe(
-      (passedReq: any) => {
-        expect(passedReq.headers.has('X-Tenant-ID')).toBeFalse();
-        done();
-      },
-    );
+    const passedReq = await firstValueFrom(
+      TestBed.runInInjectionContext(() => tenantInterceptor(req, mockNext)),
+    ) as any;
+    expect(passedReq.headers.has('X-Tenant-ID')).toBe(false);
   });
 
-  it('should NOT add X-Tenant-ID header for external URLs', (done) => {
+  it('should NOT add X-Tenant-ID header for external URLs', async () => {
     TestBed.overrideProvider(AuthService, {
       useValue: makeAuthService(true, 'tenant-abc'),
     });
 
     const req = new HttpRequest('GET', 'https://external.example.com/resource');
-    TestBed.runInInjectionContext(() => tenantInterceptor(req, mockNext)).subscribe(
-      (passedReq: any) => {
-        expect(passedReq.headers?.has?.('X-Tenant-ID') ?? false).toBeFalse();
-        done();
-      },
-    );
+    const passedReq = await firstValueFrom(
+      TestBed.runInInjectionContext(() => tenantInterceptor(req, mockNext)),
+    ) as any;
+    expect(passedReq.headers?.has?.('X-Tenant-ID') ?? false).toBe(false);
   });
 });

@@ -34,7 +34,7 @@ describe('Onboarding', () => {
   // ─── registerEditora() ────────────────────────────────────────────────────
 
   describe('registerEditora()', () => {
-    const payload = { nomeEditora: 'Editora A', emailAdmin: 'admin@a.com', senha: 'Senha@123', nomeAdmin: 'Admin' };
+    const payload = { nomeEditora: 'Editora A', emailAdmin: 'admin@a.com', senha: 'Senha@123', nomeAdmin: 'Admin', aceitouTermos: true };
     const response: RegisterEditoraResponse = { editoraId: 'id-1', message: 'Cadastrado com sucesso' };
 
     it('should POST to /api/auth/register with the payload', () => {
@@ -56,7 +56,13 @@ describe('Onboarding', () => {
   // ─── login() ──────────────────────────────────────────────────────────────
 
   describe('login()', () => {
-    const loginResponse: LoginResponse = { token: 'jwt-token', message: 'Autenticado' };
+    const loginResponse: LoginResponse = {
+      usuarioId: 'user-1',
+      nome: 'Admin',
+      email: 'u@a.com',
+      contextos: [],
+      message: 'Autenticado',
+    };
 
     it('should POST to /api/auth/login with email and senha', () => {
       service.login('u@a.com', 'pass').subscribe();

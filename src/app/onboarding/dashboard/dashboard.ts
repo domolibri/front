@@ -1,4 +1,6 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { catchError, of } from 'rxjs';
 import { RouterLink } from '@angular/router';
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { AuthService } from '../../shared/auth.service';
@@ -21,19 +23,15 @@ interface DashboardCard {
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Dashboard implements OnInit {
+export class Dashboard {
   protected readonly auth = inject(AuthService);
   private readonly userService = inject(UserService);
 
-  protected showInviteModal = signal(false);
-  protected roles = signal<Role[]>([]);
-
-  ngOnInit(): void {
-    this.userService.getRoles().subscribe({
-      next: (roles) => this.roles.set(roles),
-      error: () => { /* roles stay empty; modal will show an empty select */ },
-    });
-  }
+  protected readonly showInviteModal = signal(false);
+  protected readonly roles = toSignal(
+    this.userService.getRoles().pipe(catchError(() => of([] as Role[]))),
+    { initialValue: [] as Role[] },
+  );
 
   protected openInviteModal(): void {
     this.showInviteModal.set(true);

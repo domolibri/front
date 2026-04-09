@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -14,6 +14,7 @@ import { SnackbarService } from '../../shared/snackbar.service';
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login {
   form: FormGroup;
@@ -38,6 +39,7 @@ export class Login {
     private auth: AuthService,
     private snackbar: SnackbarService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -78,6 +80,7 @@ export class Login {
             // Multiple editoras — show the context-selection step
             this.contextos = result.contextos;
             this.step = 'select-context';
+            this.cdr.markForCheck();
           }
         },
         error: (err) => {
@@ -90,6 +93,7 @@ export class Login {
           } else {
             this.snackbar.show('Erro inesperado. Tente novamente.', 'error');
           }
+          this.cdr.markForCheck();
         },
       });
   }
@@ -107,6 +111,7 @@ export class Login {
       .subscribe({
         next: (authenticated) => {
           this.isLoading = false;
+          this.cdr.markForCheck();
           this.router.navigate([authenticated ? '/dashboard' : '/']);
         },
         error: (err) => {
@@ -117,6 +122,7 @@ export class Login {
           } else {
             this.snackbar.show('Erro inesperado. Tente novamente.', 'error');
           }
+          this.cdr.markForCheck();
         },
       });
   }
@@ -134,10 +140,12 @@ export class Login {
         next: () => {
           this.isResending = false;
           this.resendSuccess = true;
+          this.cdr.markForCheck();
         },
         error: () => {
           this.isResending = false;
           this.resendError = 'Não foi possível reenviar. Tente novamente.';
+          this.cdr.markForCheck();
         },
       });
   }

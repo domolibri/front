@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -13,6 +13,7 @@ import { SnackbarService } from '../../shared/snackbar.service';
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Register {
   form: FormGroup;
@@ -28,6 +29,7 @@ export class Register {
     private auth: AuthService,
     private snackbar: SnackbarService,
     private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {
     this.form = this.fb.group({
       nomeEditora: ['', [Validators.required, Validators.minLength(2)]],
@@ -87,6 +89,7 @@ export class Register {
           } else {
             this.snackbar.show('Erro inesperado. Tente novamente.', 'error');
           }
+          this.cdr.markForCheck();
         },
       });
   }

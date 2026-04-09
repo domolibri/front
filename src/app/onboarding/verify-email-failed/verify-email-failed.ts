@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 @Component({
@@ -6,6 +6,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
   imports: [RouterLink],
   templateUrl: './verify-email-failed.html',
   styleUrl: './verify-email-failed.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VerifyEmailFailed implements OnInit {
   detail = '';

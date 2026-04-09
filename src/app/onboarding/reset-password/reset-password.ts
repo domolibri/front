@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
@@ -23,6 +23,7 @@ function senhasIguaisValidator(control: AbstractControl): ValidationErrors | nul
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResetPassword implements OnInit {
   form: FormGroup;
@@ -39,6 +40,7 @@ export class ResetPassword implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private onboarding: Onboarding,
+    private cdr: ChangeDetectorRef,
   ) {
     this.form = this.fb.group(
       {
@@ -87,11 +89,13 @@ export class ResetPassword implements OnInit {
         next: () => {
           this.isLoading = false;
           this.success = true;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.isLoading = false;
           this.errorMessage =
             err?.error?.detail ?? 'Link inválido ou expirado. Solicite um novo link.';
+          this.cdr.markForCheck();
         },
       });
   }
