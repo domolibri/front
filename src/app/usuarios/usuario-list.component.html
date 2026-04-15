@@ -1,0 +1,65 @@
+<div class="usuarios">
+  <section class="usuarios__header">
+    <div>
+      <h1 class="usuarios__title">Usuários</h1>
+      <p class="usuarios__subtitle">Gerencie colaboradores internos e parceiros vinculados à editora atual.</p>
+    </div>
+
+    <button type="button" class="usuarios__action" (click)="openInviteModal()">
+      Convidar usuário
+    </button>
+  </section>
+
+  @if (isLoading()) {
+    <section class="usuarios__state">
+      <div class="usuarios__spinner" aria-hidden="true"></div>
+      <p>Carregando usuários...</p>
+    </section>
+  } @else if (errorMessage()) {
+    <section class="usuarios__state usuarios__state--error">
+      <p>{{ errorMessage() }}</p>
+      <button type="button" class="usuarios__retry" (click)="retry()">Tentar novamente</button>
+    </section>
+  } @else if (!usuarios().length) {
+    <section class="usuarios__state">
+      <p>Nenhum usuário vinculado ainda.</p>
+    </section>
+  } @else {
+    <section class="usuarios__table-wrap">
+      <table class="usuarios__table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Tipo de vínculo</th>
+            <th>Status</th>
+            <th>Data de entrada</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (usuario of usuarios(); track usuario.id) {
+            <tr>
+              <td>{{ usuario.nome }}</td>
+              <td>{{ usuario.email }}</td>
+              <td>{{ usuario.tipoVinculo }}</td>
+              <td>
+                <span class="usuarios__status" [class.usuarios__status--inactive]="usuario.status !== 'Ativo'">
+                  {{ usuario.status }}
+                </span>
+              </td>
+              <td>{{ usuario.dataEntrada | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  }
+</div>
+
+@if (showInviteModal()) {
+  <app-invite-modal
+    [roles]="roles()"
+    (closed)="closeInviteModal()"
+    (invited)="onUserInvited()"
+  />
+}

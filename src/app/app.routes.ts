@@ -6,6 +6,10 @@ export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./onboarding/login/login').then((m) => m.Login) },
   { path: 'cadastro', loadComponent: () => import('./onboarding/register/register').then((m) => m.Register) },
   {
+    path: 'cadastro/convite',
+    loadComponent: () => import('./onboarding/register/register-invite').then((m) => m.RegisterInvite),
+  },
+  {
     path: 'cadastro/sucesso',
     loadComponent: () => import('./onboarding/register-success/register-success').then((m) => m.RegisterSuccess),
   },
@@ -37,6 +41,10 @@ export const routes: Routes = [
       {
         path: 'branding',
         loadComponent: () => import('./onboarding/branding/branding').then((m) => m.Branding),
+      },
+      {
+        path: 'usuarios',
+        loadComponent: () => import('./usuarios/usuario-list.component').then((m) => m.UsuarioListComponent),
       },
     ],
   },

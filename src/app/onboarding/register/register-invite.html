@@ -1,0 +1,88 @@
+<div class="register">
+  <div class="register__card">
+    <a routerLink="/" class="register__back">← Voltar</a>
+
+    @if (isLoading()) {
+      <div class="register__loading">Carregando detalhes do convite...</div>
+    } @else if (errorMessage()) {
+      <h1 class="register__title">Oops!</h1>
+      <div class="form-alert form-alert--error">{{ errorMessage() }}</div>
+      <p class="register__subtitle">Peça um novo convite ao administrador da editora.</p>
+    } @else if (inviteDetails(); as details) {
+      @if (details.usuarioExiste) {
+        <h1 class="register__title">Bem-vindo(a) de volta!</h1>
+        <p class="register__subtitle">
+          Identificamos que você já possui uma conta global no DomoLibri. Basta clicar no botão abaixo para aceitar o vínculo com a editora <strong>{{ details.nomeEditora }}</strong>.
+        </p>
+      } @else {
+        <h1 class="register__title">Bem-vindo(a)!</h1>
+        <p class="register__subtitle">
+          Você foi convidado para se juntar à editora <strong>{{ details.nomeEditora }}</strong>.
+        </p>
+        <p class="register__subtitle">Complete seu cadastro abaixo para o e-mail: <strong>{{ details.email }}</strong></p>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="register__form" novalidate>
+
+        @if (!details.usuarioExiste) {
+          <div class="form-group">
+            <label for="nome">Seu nome completo</label>
+            <input
+              id="nome"
+              type="text"
+              formControlName="nome"
+              placeholder="Ex: João Silva"
+              [class.is-invalid]="form.controls.nome.invalid && form.controls.nome.touched"
+            />
+            @if (form.controls.nome.touched && form.controls.nome.errors?.['required']) {
+              <span class="form-error">Nome é obrigatório.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="senha">Defina sua senha</label>
+            <input
+              id="senha"
+              type="password"
+              formControlName="senha"
+              placeholder="Mínimo 8 caracteres"
+              [class.is-invalid]="form.controls.senha.invalid && form.controls.senha.touched"
+            />
+            <p class="form-hint">Mínimo de 8 caracteres, com letra maiúscula, minúscula, número e símbolo.</p>
+            @if (form.controls.senha.touched && form.controls.senha.errors?.['required']) {
+              <span class="form-error">Senha é obrigatória.</span>
+            }
+            @if (form.controls.senha.touched && form.controls.senha.errors?.['pattern']) {
+              <span class="form-error">Senha não atende aos requisitos de segurança.</span>
+            }
+          </div>
+        }
+
+        <div class="form-group form-group--checkbox">
+          <label class="checkbox-label" [class.is-invalid]="form.controls.aceitouTermos.touched && form.controls.aceitouTermos.errors?.['required']">
+            <input
+              id="aceitouTermos"
+              type="checkbox"
+              formControlName="aceitouTermos"
+            />
+            <span>
+              Aceito os
+              <a href="/termos-de-uso" target="_blank" rel="noopener noreferrer" class="terms-link">Termos de Uso</a>
+              e a
+              <a href="/politica-de-privacidade" target="_blank" rel="noopener noreferrer" class="terms-link">Política de Privacidade</a>
+            </span>
+          </label>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="form-alert form-alert--error">{{ errorMessage() }}</div>
+        }
+
+        <button type="submit" class="register__btn" [disabled]="isSubmitting()">
+          {{ isSubmitting() ? 'Processando...' : 'Aceitar convite e concluir' }}
+        </button>
+
+      </form>
+    }
+  </div>
+</div>

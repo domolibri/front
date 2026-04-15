@@ -1,0 +1,139 @@
+.usuario-form__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 30;
+}
+
+.usuario-form__panel {
+  width: min(100%, 32rem);
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.24);
+  padding: 1.5rem;
+}
+
+.usuario-form__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.usuario-form__title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #111827;
+}
+
+.usuario-form__close {
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+.usuario-form__desc {
+  margin: 0.75rem 0 1.25rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.usuario-form__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.usuario-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.usuario-form__btn-cancel,
+.usuario-form__btn-submit {
+  border-radius: 0.625rem;
+  padding: 0.7rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.usuario-form__btn-cancel {
+  background: #fff;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.usuario-form__btn-submit {
+  background: var(--cor-primaria);
+  color: #fff;
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: wait;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  label {
+    font-weight: 600;
+    color: #374151;
+  }
+
+  input,
+  select {
+    border: 1px solid #d1d5db;
+    border-radius: 0.625rem;
+    padding: 0.75rem 0.9rem;
+    font: inherit;
+    outline: none;
+
+    &:focus {
+      border-color: var(--cor-primaria);
+      box-shadow: 0 0 0 3px var(--cor-primaria-bg);
+    }
+  }
+}
+
+.is-invalid {
+  border-color: #ef4444 !important;
+}
+
+.form-error {
+  color: #dc2626;
+  font-size: 0.8rem;
+}
+
+.form-alert {
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.625rem;
+  font-size: 0.9rem;
+}
+
+.form-alert--error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}

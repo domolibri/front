@@ -19,6 +19,19 @@ export interface InviteUserResponse {
   message: string;
 }
 
+export interface InviteDetails {
+  email: string;
+  nomeEditora: string;
+  roleId: string;
+  usuarioExiste?: boolean;
+}
+
+export interface AcceptInvitePayload {
+  token: string;
+  nome?: string;
+  senha?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly http = inject(HttpClient);
@@ -30,5 +43,13 @@ export class UserService {
 
   inviteUser(payload: InviteUserPayload): Observable<InviteUserResponse> {
     return this.http.post<InviteUserResponse>(`${this.base}/invite`, payload);
+  }
+
+  getInviteDetails(token: string): Observable<InviteDetails> {
+    return this.http.get<InviteDetails>(`${this.base}/invite/${token}`);
+  }
+
+  acceptInvite(payload: AcceptInvitePayload): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.base}/invite/accept`, payload);
   }
 }

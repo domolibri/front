@@ -56,8 +56,8 @@ export class Dashboard {
         title: 'Usuários',
         description: 'Gerencie administradores e editores da sua equipe.',
         icon: 'users',
-        route: null,
-        badge: 'Em breve',
+        route: '/usuarios',
+        badge: null,
       },
       {
         title: 'Livros',
