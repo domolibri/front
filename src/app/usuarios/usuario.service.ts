@@ -22,6 +22,7 @@ export interface VinculoUsuarioResponseDto {
 export class UsuarioService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/api/usuarios`;
+  private readonly usersUrl = `${environment.apiUrl}/api/users`;
 
   getUsuarios(): Observable<VinculoUsuarioResponseDto[]> {
     return this.http.get<VinculoUsuarioResponseDto[]>(this.baseUrl);
@@ -29,5 +30,13 @@ export class UsuarioService {
 
   cadastrarUsuario(payload: CriarUsuarioDto): Observable<VinculoUsuarioResponseDto> {
     return this.http.post<VinculoUsuarioResponseDto>(this.baseUrl, payload);
+  }
+
+  atualizarRoles(vinculoId: string, roleIds: string[]): Observable<void> {
+    return this.http.put<void>(`${environment.apiUrl}/api/users/${vinculoId}/roles`, roleIds);
+  }
+
+  updateRoles(vinculoId: string, roleIds: string[]): Observable<void> {
+    return this.http.put<void>(`${environment.apiUrl}/api/users/${vinculoId}/roles`, roleIds);
   }
 }

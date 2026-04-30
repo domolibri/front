@@ -1,7 +1,9 @@
 <div class="usuario-form__backdrop" (click)="onBackdropClick($event)" role="dialog" aria-modal="true" aria-labelledby="usuario-form-title">
   <div class="usuario-form__panel">
     <div class="usuario-form__header">
-      <h2 class="usuario-form__title" id="usuario-form-title">Cadastrar usuário</h2>
+      <h2 class="usuario-form__title" id="usuario-form-title">
+        {{ vinculoData() ? 'Editar Roles' : 'Cadastrar usuário' }}
+      </h2>
       <button type="button" class="usuario-form__close" (click)="close()" aria-label="Fechar">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18" />
@@ -11,55 +13,84 @@
     </div>
 
     <p class="usuario-form__desc">
-      Cadastre colaboradores internos e parceiros sem informar a editora no formulário.
+      {{ vinculoData() 
+        ? 'Selecione as roles para este usuário.' 
+        : 'Cadastre colaboradores internos e parceiros sem informar a editora no formulário.' 
+      }}
     </p>
 
     <form [formGroup]="usuarioForm" (ngSubmit)="submit()" class="usuario-form__form" novalidate>
-      <div class="form-group">
-        <label for="usuario-nome">Nome</label>
-        <input
-          id="usuario-nome"
-          type="text"
-          formControlName="nome"
-          placeholder="Ex: Maria Oliveira"
-          [class.is-invalid]="f['nome'].invalid && f['nome'].touched"
-        />
-        @if (f['nome'].touched && f['nome'].errors?.['required']) {
-          <span class="form-error">Nome é obrigatório.</span>
-        }
-        @if (f['nome'].touched && f['nome'].errors?.['minlength']) {
-          <span class="form-error">Informe pelo menos 2 caracteres.</span>
-        }
-      </div>
-
-      <div class="form-group">
-        <label for="usuario-email">E-mail</label>
-        <input
-          id="usuario-email"
-          type="email"
-          formControlName="email"
-          placeholder="usuario@editora.com"
-          [class.is-invalid]="f['email'].invalid && f['email'].touched"
-        />
-        @if (f['email'].touched && f['email'].errors?.['required']) {
-          <span class="form-error">E-mail é obrigatório.</span>
-        }
-        @if (f['email'].touched && f['email'].errors?.['email']) {
-          <span class="form-error">Informe um e-mail válido.</span>
-        }
-      </div>
-
-      <div class="form-group">
-        <label for="usuario-tipo-vinculo">Tipo de vínculo</label>
-        <select
-          id="usuario-tipo-vinculo"
-          formControlName="tipoVinculo"
-          [class.is-invalid]="f['tipoVinculo'].invalid && f['tipoVinculo'].touched"
-        >
-          @for (tipo of tiposVinculo; track tipo) {
-            <option [value]="tipo">{{ tipo }}</option>
+      @if (!vinculoData()) {
+        <div class="form-group">
+          <label for="usuario-nome">Nome</label>
+          <input
+            id="usuario-nome"
+            type="text"
+            formControlName="nome"
+            placeholder="Ex: Maria Oliveira"
+            [class.is-invalid]="f['nome'].invalid && f['nome'].touched"
+          />
+          @if (f['nome'].touched && f['nome'].errors?.['required']) {
+            <span class="form-error">Nome é obrigatório.</span>
           }
-        </select>
+          @if (f['nome'].touched && f['nome'].errors?.['minlength']) {
+            <span class="form-error">Informe pelo menos 2 caracteres.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="usuario-email">E-mail</label>
+          <input
+            id="usuario-email"
+            type="email"
+            formControlName="email"
+            placeholder="usuario@editora.com"
+            [class.is-invalid]="f['email'].invalid && f['email'].touched"
+          />
+          @if (f['email'].touched && f['email'].errors?.['required']) {
+            <span class="form-error">E-mail é obrigatório.</span>
+          }
+          @if (f['email'].touched && f['email'].errors?.['email']) {
+            <span class="form-error">Informe um e-mail válido.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="usuario-tipo-vinculo">Tipo de vínculo</label>
+          <select
+            id="usuario-tipo-vinculo"
+            formControlName="tipoVinculo"
+            [class.is-invalid]="f['tipoVinculo'].invalid && f['tipoVinculo'].touched"
+          >
+            @for (tipo of tiposVinculo; track tipo) {
+              <option [value]="tipo">{{ tipo }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <div class="form-group">
+        <label>Roles</label>
+        <div class="roles-selector">
+          @for (role of roles(); track role.id) {
+            <label class="role-checkbox">
+              <input
+                type="checkbox"
+                [checked]="isRoleSelected(role.id)"
+                (change)="toggleRole(role.id)"
+              />
+              <span class="role-label">
+                {{ role.nome }}
+                @if (role.descricao) {
+                  <small>{{ role.descricao }}</small>
+                }
+              </span>
+            </label>
+          }
+          @if (roles().length === 0) {
+            <p class="roles-empty">Nenhuma role disponível.</p>
+          }
+        </div>
       </div>
 
       @if (errorMessage()) {
@@ -69,7 +100,7 @@
       <div class="usuario-form__actions">
         <button type="button" class="usuario-form__btn-cancel" (click)="close()">Cancelar</button>
         <button type="submit" class="usuario-form__btn-submit" [disabled]="isSubmitting()">
-          {{ isSubmitting() ? 'Salvando...' : 'Salvar usuário' }}
+          {{ isSubmitting() ? 'Salvando...' : (vinculoData() ? 'Atualizar Roles' : 'Salvar usuário') }}
         </button>
       </div>
     </form>

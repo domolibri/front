@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { authGuard } from './shared/auth-guard';
 
 export const routes: Routes = [
-  { path: '', loadComponent: () => import('./home/home').then((m) => m.Home) },
   { path: 'login', loadComponent: () => import('./onboarding/login/login').then((m) => m.Login) },
   { path: 'cadastro', loadComponent: () => import('./onboarding/register/register').then((m) => m.Register) },
   {
@@ -34,6 +33,7 @@ export const routes: Routes = [
     loadComponent: () => import('./shared/app-shell/app-shell').then((m) => m.AppShell),
     canActivate: [authGuard],
     children: [
+      { path: '', loadComponent: () => import('./home/home').then((m) => m.Home) },
       {
         path: 'dashboard',
         loadComponent: () => import('./onboarding/dashboard/dashboard').then((m) => m.Dashboard),

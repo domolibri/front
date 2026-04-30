@@ -20,6 +20,6 @@ export const authGuard: CanActivateFn = () => {
   // sem disparar nova requisição HTTP.
   return auth.initialized$.pipe(
     take(1),
-    map(() => (auth.isAuthenticated() ? true : router.createUrlTree(['/']))),
+    map(() => (auth.isAuthenticated() ? true : router.createUrlTree(['/login']))),
   );
 };
